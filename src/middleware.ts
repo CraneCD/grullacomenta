@@ -145,18 +145,15 @@ export const config = {
     // all requests that have a locale prefix
     '/(es|en)/:path*',
     
-    // Enable redirects that add missing locales
-    // (e.g. `/pathnames` -> `/en/pathnames`)
-    // Exclude API routes, Next.js internals and files with extensions
-    '/((?!api|_next|_vercel|.*\\..*).*)',
-
     /*
      * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
+     * - api (API routes)
+     * - _next (Next.js internals)
+     * - _vercel (Vercel internals)
      * - favicon.ico (favicon file)
      * - public folder
+     * - files with extensions
      */
-    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    '/((?!api|_next|_vercel|favicon.ico|public|.*\\.).*)',
   ]
 }; 
