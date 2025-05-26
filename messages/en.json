@@ -1,0 +1,110 @@
+{
+  "navigation": {
+    "home": "Home",
+    "reviews": "Posts",
+    "anime": "Anime",
+    "manga": "Manga",
+    "videoGames": "Video Games",
+    "admin": "Admin",
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "search": "Search posts..."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close",
+    "viewAll": "View all"
+  },
+  "search": {
+    "title": "Search Results",
+    "noResults": "No posts found",
+    "searchPlaceholder": "Search posts...",
+    "resultsFor": "Search results for",
+    "foundResults": "Found {count} post(s) matching your search",
+    "tryDifferent": "Try searching with different keywords"
+  },
+  "home": {
+    "title": "Posts Blog",
+    "subtitle": "Your personal space for anime, manga, and video game posts",
+    "welcomeMessage": "Welcome to our posts blog",
+    "latestReviews": "Latest Posts",
+    "featuredReviews": "Featured Posts",
+    "noReviews": "No posts available"
+  },
+  "reviews": {
+    "title": "Posts",
+    "readMore": "Read more",
+    "rating": "Rating",
+    "category": "Category",
+    "publishedOn": "Published on",
+    "author": "Author",
+    "tags": "Tags",
+    "relatedReviews": "Related Posts",
+    "shareReview": "Share Post",
+    "backToReviews": "Back to Posts",
+    "reviewNotFound": "Post Not Found",
+    "returnToHome": "Return to Home",
+    "loadingReview": "Loading post...",
+    "animeMangaTitle": "Anime & Manga Posts",
+    "animeMangaDescription": "Discover our latest posts about anime series and manga volumes.",
+    "videoGamesTitle": "Video Game Posts",
+    "videoGamesDescription": "Explore our posts about the latest video games.",
+    "loadingReviews": "Loading posts...",
+    "noReviewsAvailable": "No {category} posts available yet.",
+    "noReviewsGeneral": "No posts available yet.",
+    "filterAll": "All",
+    "filterAnime": "Anime",
+    "filterManga": "Manga",
+    "platformAll": "All",
+    "platformPlayStation": "PlayStation",
+    "platformXbox": "Xbox",
+    "platformNintendo": "Nintendo",
+    "platformPC": "PC"
+  },
+  "categories": {
+    "anime": "Anime and Manga",
+    "manga": "Manga",
+    "videoGames": "Video Games",
+    "all": "All Posts",
+    "playstation": "PlayStation",
+    "xbox": "Xbox",
+    "nintendo": "Nintendo",
+    "pc": "PC"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "manageReviews": "Manage Posts",
+    "createReview": "Create Post",
+    "editReview": "Edit Post",
+    "deleteReview": "Delete Post",
+    "statistics": "Statistics",
+    "settings": "Settings"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "invalidCredentials": "Invalid credentials",
+    "accessDenied": "Access denied"
+  },
+  "language": {
+    "spanish": "Spanish",
+    "english": "English",
+    "selectLanguage": "Select language"
+  }
+} 
