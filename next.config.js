@@ -50,7 +50,12 @@ const nextConfig = {
       }
     ],
   },
-  // Add security headers
+  experimental: {
+    serverActions: true,
+  },
+  // Ensure API routes are not statically optimized
+  output: 'standalone',
+  // Configure API routes
   async headers() {
     return [
       {
@@ -85,7 +90,16 @@ const nextConfig = {
             value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
           }
         ]
-      }
+      },
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
+          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version' },
+        ],
+      },
     ];
   }
 };
