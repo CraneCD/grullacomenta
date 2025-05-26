@@ -1,0 +1,110 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "reviews": "Publicaciones",
+    "anime": "Anime",
+    "manga": "Manga",
+    "videoGames": "Videojuegos",
+    "admin": "Administrador",
+    "login": "Iniciar Sesión",
+    "logout": "Cerrar Sesión",
+    "search": "Buscar publicaciones..."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "submit": "Enviar",
+    "close": "Cerrar",
+    "viewAll": "Ver todas"
+  },
+  "search": {
+    "title": "Resultados de Búsqueda",
+    "noResults": "No se encontraron publicaciones",
+    "searchPlaceholder": "Buscar publicaciones...",
+    "resultsFor": "Resultados de búsqueda para",
+    "foundResults": "Se encontraron {count} publicación(es) que coinciden con tu búsqueda",
+    "tryDifferent": "Intenta buscar con palabras clave diferentes"
+  },
+  "home": {
+    "title": "Blog de Publicaciones",
+    "subtitle": "Tu espacio personal para publicaciones de anime, manga y videojuegos",
+    "welcomeMessage": "Bienvenido a nuestro blog de publicaciones",
+    "latestReviews": "Últimas Publicaciones",
+    "featuredReviews": "Publicaciones Destacadas",
+    "noReviews": "No hay publicaciones disponibles"
+  },
+  "reviews": {
+    "title": "Publicaciones",
+    "readMore": "Leer más",
+    "rating": "Calificación",
+    "category": "Categoría",
+    "publishedOn": "Publicado el",
+    "author": "Autor",
+    "tags": "Etiquetas",
+    "relatedReviews": "Publicaciones Relacionadas",
+    "shareReview": "Compartir Publicación",
+    "backToReviews": "Volver a Publicaciones",
+    "reviewNotFound": "Publicación No Encontrada",
+    "returnToHome": "Volver al Inicio",
+    "loadingReview": "Cargando publicación...",
+    "animeMangaTitle": "Publicaciones de Anime y Manga",
+    "animeMangaDescription": "Descubre nuestras últimas publicaciones sobre series de anime y volúmenes de manga.",
+    "videoGamesTitle": "Publicaciones de Videojuegos",
+    "videoGamesDescription": "Explora nuestras publicaciones sobre los últimos videojuegos.",
+    "loadingReviews": "Cargando publicaciones...",
+    "noReviewsAvailable": "No hay publicaciones de {category} disponibles aún.",
+    "noReviewsGeneral": "No hay publicaciones disponibles aún.",
+    "filterAll": "Todas",
+    "filterAnime": "Anime",
+    "filterManga": "Manga",
+    "platformAll": "Todas",
+    "platformPlayStation": "PlayStation",
+    "platformXbox": "Xbox",
+    "platformNintendo": "Nintendo",
+    "platformPC": "PC"
+  },
+  "categories": {
+    "anime": "Anime y Manga",
+    "manga": "Manga",
+    "videoGames": "Videojuegos",
+    "all": "Todas las Publicaciones",
+    "playstation": "PlayStation",
+    "xbox": "Xbox",
+    "nintendo": "Nintendo",
+    "pc": "PC"
+  },
+  "admin": {
+    "dashboard": "Panel de Control",
+    "manageReviews": "Gestionar Publicaciones",
+    "createReview": "Crear Publicación",
+    "editReview": "Editar Publicación",
+    "deleteReview": "Eliminar Publicación",
+    "statistics": "Estadísticas",
+    "settings": "Configuración"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "invalidCredentials": "Credenciales inválidas",
+    "accessDenied": "Acceso denegado"
+  },
+  "language": {
+    "spanish": "Español",
+    "english": "Inglés",
+    "selectLanguage": "Seleccionar idioma"
+  }
+} 
