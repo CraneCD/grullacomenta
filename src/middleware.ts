@@ -126,8 +126,8 @@ export default async function middleware(req: NextRequestWithAuth) {
     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
   );
 
-  // Verify CSRF token for non-GET requests
-  if (req.method !== 'GET') {
+  // Verify CSRF token for non-GET requests (but not for API routes)
+  if (req.method !== 'GET' && !pathname.startsWith('/api/')) {
     if (!token) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
