@@ -115,11 +115,16 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
         : `/api/reviews`;
       const method = isEditing ? 'PUT' : 'POST';
 
-      // Get CSRF token from meta tag
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      if (!csrfToken) {
-        throw new Error('CSRF token not found. Please refresh the page and try again.');
+      // Get CSRF token from API
+      const csrfResponse = await fetch('/api/csrf', {
+        credentials: 'include'
+      });
+      
+      if (!csrfResponse.ok) {
+        throw new Error('Failed to get CSRF token. Please make sure you are logged in.');
       }
+      
+      const { token: csrfToken } = await csrfResponse.json();
 
       // Prepare form data with backward compatibility
       const submitData = {
@@ -182,13 +187,17 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
       const formData = new FormData();
       formData.append('image', file);
 
-      // Get CSRF token from meta tag
-      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      console.log('CSRF Token found:', csrfToken ? 'Yes' : 'No');
+      // Get CSRF token from API
+      const csrfResponse = await fetch('/api/csrf', {
+        credentials: 'include'
+      });
       
-      if (!csrfToken) {
-        throw new Error('CSRF token not found. Please refresh the page and try again.');
+      if (!csrfResponse.ok) {
+        throw new Error('Failed to get CSRF token. Please make sure you are logged in.');
       }
+      
+      const { token: csrfToken } = await csrfResponse.json();
+      console.log('CSRF Token obtained:', csrfToken ? 'Yes' : 'No');
       
       // Use absolute path to avoid locale prefix
       console.log('Sending upload request to /api/upload');
