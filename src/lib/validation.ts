@@ -3,6 +3,8 @@ import { z } from 'zod';
 // Review validation schema
 export const reviewSchema = z.object({
   title: z.string().min(3).max(100),
+  titleEs: z.string().min(3).max(100).optional(),
+  titleEn: z.string().min(3).max(100).optional(),
   content: z.string().min(10),
   contentEs: z.string().min(10).optional(),
   contentEn: z.string().min(10).optional(),

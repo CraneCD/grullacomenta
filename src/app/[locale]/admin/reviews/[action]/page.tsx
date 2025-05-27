@@ -7,6 +7,8 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 interface ReviewFormData {
   title: string;
+  titleEs: string;
+  titleEn: string;
   category: string;
   platform?: string;
   content: string; // Keep for backward compatibility
@@ -21,6 +23,8 @@ interface ReviewFormData {
 
 const initialFormData: ReviewFormData = {
   title: '',
+  titleEs: '',
+  titleEn: '',
   category: '',
   platform: '',
   content: '',
@@ -39,6 +43,7 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [useImageUpload, setUseImageUpload] = useState(false);
   const [activeContentTab, setActiveContentTab] = useState<'es' | 'en'>('es');
+  const [activeTitleTab, setActiveTitleTab] = useState<'es' | 'en'>('es');
   const searchParams = useSearchParams();
   const router = useRouter();
   const reviewId = searchParams.get('id');
@@ -58,6 +63,8 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
         const review = await response.json();
         setFormData({
           title: review.title,
+          titleEs: review.titleEs || review.title || '',
+          titleEn: review.titleEn || '',
           category: review.category,
           platform: review.platform || '',
           content: review.content,
@@ -100,6 +107,12 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
       return;
     }
 
+    // Validate that at least one language title is provided
+    if (!formData.titleEs && !formData.titleEn) {
+      alert('Please provide a title in at least one language (Spanish or English)');
+      return;
+    }
+
     // Validate that at least one language content is provided
     if (!formData.contentEs && !formData.contentEn) {
       alert('Please provide content in at least one language (Spanish or English)');
@@ -129,6 +142,8 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
       // Prepare form data with backward compatibility
       const submitData = {
         ...formData,
+        // Ensure title is set for backward compatibility
+        title: formData.titleEs || formData.titleEn || formData.title || '', // Use Spanish as primary, fallback to English
         // Ensure content is at least 10 characters
         content: formData.contentEs || formData.contentEn || '', // Use Spanish as primary, fallback to English
         // Convert rating to number if it exists
@@ -298,22 +313,89 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Title */}
-          <div className="space-y-2">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-300">
-              Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              className="w-full px-4 py-2 bg-[#1a1a1a] border border-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
-              required
-            />
+        {/* Multilingual Titles */}
+        <div className="space-y-4 mb-6">
+          <label className="block text-sm font-medium text-gray-300">
+            Titles
+          </label>
+          
+          {/* Title Language Tabs */}
+          <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg">
+            <button
+              type="button"
+              onClick={() => setActiveTitleTab('es')}
+              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTitleTab === 'es'
+                  ? 'bg-blue-500 text-white'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
+              }`}
+            >
+              🇪🇸 Español
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTitleTab('en')}
+              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeTitleTab === 'en'
+                  ? 'bg-blue-500 text-white'
+                  : 'text-gray-300 hover:text-white hover:bg-gray-700'
+              }`}
+            >
+              🇺🇸 English
+            </button>
           </div>
+
+          {/* Spanish Title */}
+          {activeTitleTab === 'es' && (
+            <div className="space-y-2">
+              <label htmlFor="titleEs" className="block text-sm font-medium text-gray-400">
+                Título en Español
+              </label>
+              <input
+                type="text"
+                id="titleEs"
+                name="titleEs"
+                value={formData.titleEs}
+                onChange={handleChange}
+                placeholder="Ingresa el título en español..."
+                className="w-full px-4 py-2 bg-[#1a1a1a] border border-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+          )}
+
+          {/* English Title */}
+          {activeTitleTab === 'en' && (
+            <div className="space-y-2">
+              <label htmlFor="titleEn" className="block text-sm font-medium text-gray-400">
+                Title in English
+              </label>
+              <input
+                type="text"
+                id="titleEn"
+                name="titleEn"
+                value={formData.titleEn}
+                onChange={handleChange}
+                placeholder="Enter the title in English..."
+                className="w-full px-4 py-2 bg-[#1a1a1a] border border-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+              />
+            </div>
+          )}
+
+          {/* Title Status Indicators */}
+          <div className="flex space-x-4 text-xs">
+            <div className={`flex items-center space-x-2 ${formData.titleEs ? 'text-green-400' : 'text-gray-500'}`}>
+              <div className={`w-2 h-2 rounded-full ${formData.titleEs ? 'bg-green-400' : 'bg-gray-500'}`}></div>
+              <span>Español: {formData.titleEs ? 'Completado' : 'Pendiente'}</span>
+            </div>
+            <div className={`flex items-center space-x-2 ${formData.titleEn ? 'text-green-400' : 'text-gray-500'}`}>
+              <div className={`w-2 h-2 rounded-full ${formData.titleEn ? 'bg-green-400' : 'bg-gray-500'}`}></div>
+              <span>English: {formData.titleEn ? 'Completed' : 'Pending'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* Category */}
           <div className="space-y-2">

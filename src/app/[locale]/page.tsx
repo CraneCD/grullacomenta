@@ -8,6 +8,8 @@ import ReviewGrid from '@/components/ReviewGrid';
 interface Review {
   id: string;
   title: string;
+  titleEs?: string;
+  titleEn?: string;
   category: string;
   platform?: string;
   coverImage?: string;

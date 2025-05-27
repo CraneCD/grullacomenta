@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
     
     // Type assertion for the validated data
     const validatedData = validationResult.data as z.infer<typeof reviewSchema>;
-    const { title, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = validatedData;
+    const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = validatedData;
 
     // Find the user
     const user = await prisma.user.findUnique({
@@ -139,13 +139,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate slug from title
-    const slug = title.toLowerCase()
+    // Generate slug from primary title (Spanish first, then English, fallback to title)
+    const primaryTitle = titleEs || titleEn || title;
+    const slug = primaryTitle.toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
 
     const reviewData = {
       title,
+      titleEs,
+      titleEn,
       slug,
       content,
       contentEs,
