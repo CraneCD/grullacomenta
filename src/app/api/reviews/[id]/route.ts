@@ -197,25 +197,83 @@ export async function PUT(
       authorId: user.id 
     });
 
-    const updatedReview = await prisma.review.update({
-      where: { id: params.id },
-      data: updateData,
-      include: {
+    // Use raw SQL as a workaround for schema issues
+    try {
+      const updateResult = await prisma.$executeRaw`
+        UPDATE "Review" 
+        SET 
+          title = ${title},
+          "titleEs" = ${titleEs || null},
+          "titleEn" = ${titleEn || null},
+          slug = ${slug},
+          content = ${content},
+          "contentEs" = ${contentEs || null},
+          "contentEn" = ${contentEn || null},
+          category = ${category},
+          platform = ${platform || null},
+          "coverImage" = ${coverImage || null},
+          "imageData" = ${imageData || null},
+          "imageMimeType" = ${imageMimeType || null},
+          status = ${status},
+          rating = ${rating || null},
+          "updatedAt" = NOW()
+        WHERE id = ${params.id}
+      `;
+      
+      logger.info('Raw SQL update successful', { updateResult });
+      
+      // Get the updated review
+      const updatedReviewData = await prisma.$queryRaw`
+        SELECT r.*, u.name as author_name, u.email as author_email
+        FROM "Review" r
+        JOIN "User" u ON r."authorId" = u.id
+        WHERE r.id = ${params.id}
+        LIMIT 1
+      ` as any[];
+      
+      if (updatedReviewData.length === 0) {
+        throw new Error('Review not found after update');
+      }
+      
+      const reviewResult = updatedReviewData[0];
+      const updatedReview = {
+        ...reviewResult,
         author: {
-          select: {
-            name: true,
-            email: true
+          name: reviewResult.author_name,
+          email: reviewResult.author_email
+        }
+      };
+      
+      // Clean up the flat fields
+      delete updatedReview.author_name;
+      delete updatedReview.author_email;
+      
+      logger.info('Review updated successfully via raw SQL', { 
+        id: updatedReview.id, 
+        title: updatedReview.title 
+      });
+      
+      return NextResponse.json(updatedReview);
+      
+    } catch (rawSqlError) {
+      logger.error('Raw SQL update failed, trying ORM fallback', rawSqlError as Error);
+      
+      // Fallback to ORM (might fail but let's try)
+      const updatedReview = await prisma.review.update({
+        where: { id: params.id },
+        data: updateData,
+        include: {
+          author: {
+            select: {
+              name: true,
+              email: true
+            }
           }
         }
-      }
-    });
-
-    logger.info('Review updated successfully', { 
-      id: updatedReview.id, 
-      title: updatedReview.title 
-    });
-
-    return NextResponse.json(updatedReview);
+      });
+      
+             return NextResponse.json(updatedReview);
+     }
   } catch (error) {
     logger.error('Error updating review', error as Error, {
       userEmail: session?.user?.email,
