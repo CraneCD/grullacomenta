@@ -164,7 +164,7 @@ export async function PUT(
 
     // Generate new slug if primary title changed
     const primaryTitle = titleEs || titleEn || title;
-    const existingPrimaryTitle = existingReview.titleEs || existingReview.titleEn || existingReview.title;
+    const existingPrimaryTitle = (existingReview as any).titleEs || (existingReview as any).titleEn || existingReview.title;
     let slug = existingReview.slug;
     if (primaryTitle !== existingPrimaryTitle) {
       slug = primaryTitle.toLowerCase()
