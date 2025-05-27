@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { getLocalizedTitle } from '@/lib/utils';
 
 interface Review {
   id: string;
@@ -78,19 +79,8 @@ export default function ReviewsPage() {
     }
   };
 
-  const getLocalizedTitle = (review: Review) => {
-    // Return the title based on current locale
-    if (locale === 'es') {
-      return review.titleEs || review.title;
-    } else if (locale === 'en') {
-      return review.titleEn || review.title;
-    }
-    // Fallback to default title
-    return review.title;
-  };
-
   const filteredReviews = reviews.filter(review => {
-    const localizedTitle = getLocalizedTitle(review);
+    const localizedTitle = getLocalizedTitle(review, locale);
     const matchesSearch = localizedTitle.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || review.category.toLowerCase().includes(categoryFilter.toLowerCase());
     const matchesStatus = !statusFilter || review.status.toLowerCase() === statusFilter.toLowerCase();
@@ -179,7 +169,7 @@ export default function ReviewsPage() {
                 <tr key={review.id} className="hover:bg-[#2d2d2d] transition-colors">
                   <td className="px-6 py-4">
                     <div>
-                      <div className="text-white font-medium">{getLocalizedTitle(review)}</div>
+                      <div className="text-white font-medium">{getLocalizedTitle(review, locale)}</div>
                       {review.platform && (
                         <div className="text-sm text-gray-400">{review.platform}</div>
                       )}
