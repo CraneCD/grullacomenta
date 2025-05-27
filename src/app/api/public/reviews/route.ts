@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
       coverImage: review.coverImage,
       imageData: review.imageData ? 'uploaded' : null, // Don't send actual data, just indicate if it exists
       imageMimeType: review.imageMimeType,
+      youtubeUrl: review.youtubeUrl,
       date: review.createdAt,
       updatedAt: review.updatedAt, // Add updatedAt for cache busting
       slug: review.slug,
