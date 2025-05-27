@@ -2,8 +2,33 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/authOptions';
+import { reviewSchema, validateInput } from '@/lib/validation';
+import { z } from 'zod';
 
-const prisma = new PrismaClient();
+// Use global Prisma client for serverless
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+// Console logger for serverless environment
+const logger = {
+  info: (message: string, context?: any) => {
+    console.log(`[INFO] ${message}`, context ? JSON.stringify(context) : '');
+  },
+  warn: (message: string, context?: any) => {
+    console.warn(`[WARN] ${message}`, context ? JSON.stringify(context) : '');
+  },
+  error: (message: string, error?: Error, context?: any) => {
+    console.error(`[ERROR] ${message}`, error?.message || '', context ? JSON.stringify(context) : '');
+    if (error?.stack) {
+      console.error('Stack trace:', error.stack);
+    }
+  }
+};
 
 // GET single review by ID
 export async function GET(
@@ -45,27 +70,65 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  let session;
+  
   try {
-    const session = await getServerSession(authOptions);
+    logger.info('PUT /api/reviews/[id] - Starting request processing', { id: params.id });
+    
+    session = await getServerSession(authOptions);
+    logger.info('Session result:', { hasSession: !!session, email: session?.user?.email });
     
     if (!session?.user?.email) {
+      logger.warn('Unauthorized review update attempt', { 
+        id: params.id,
+        ip: request.ip, 
+        path: request.nextUrl.pathname 
+      });
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
+    logger.info('Parsing request body');
     const body = await request.json();
-    console.log('Received body:', JSON.stringify(body, null, 2));
-    const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = body;
+    logger.info('Request body received:', { 
+      hasTitle: !!body.title, 
+      hasTitleEs: !!body.titleEs,
+      hasTitleEn: !!body.titleEn,
+      hasContent: !!body.content, 
+      hasContentEs: !!body.contentEs,
+      hasContentEn: !!body.contentEn,
+      category: body.category 
+    });
+
+    // Validate input using the same schema as POST
+    logger.info('Validating input data');
+    const validationResult = validateInput(reviewSchema, body);
+    if (!validationResult.success) {
+      logger.warn('Invalid review data', { 
+        email: session.user.email,
+        errors: validationResult.error 
+      });
+      return NextResponse.json(
+        { error: validationResult.error },
+        { status: 400 }
+      );
+    }
+
+    // Type assertion for the validated data
+    const validatedData = validationResult.data as z.infer<typeof reviewSchema>;
+    const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = validatedData;
 
     // Check if review exists and user has permission
+    logger.info('Finding existing review', { id: params.id });
     const existingReview = await prisma.review.findUnique({
       where: { id: params.id },
       include: { author: true }
     });
 
     if (!existingReview) {
+      logger.warn('Review not found', { id: params.id });
       return NextResponse.json(
         { error: 'Review not found' },
         { status: 404 }
@@ -73,11 +136,26 @@ export async function PUT(
     }
 
     // Check if user is the author or has admin role
+    logger.info('Finding user in database', { email: session.user.email });
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
     });
 
-    if (!user || (existingReview.authorId !== user.id && user.role !== 'admin')) {
+    if (!user) {
+      logger.error(`User not found during review update. Email: ${session.user.email}`);
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    if (existingReview.authorId !== user.id && user.role !== 'admin') {
+      logger.warn('Forbidden review update attempt', { 
+        reviewId: params.id,
+        reviewAuthorId: existingReview.authorId,
+        userId: user.id,
+        userRole: user.role
+      });
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }
@@ -86,7 +164,7 @@ export async function PUT(
 
     // Generate new slug if primary title changed
     const primaryTitle = titleEs || titleEn || title;
-    const existingPrimaryTitle = (existingReview as any).titleEs || (existingReview as any).titleEn || existingReview.title;
+    const existingPrimaryTitle = existingReview.titleEs || existingReview.titleEn || existingReview.title;
     let slug = existingReview.slug;
     if (primaryTitle !== existingPrimaryTitle) {
       slug = primaryTitle.toLowerCase()
@@ -94,28 +172,30 @@ export async function PUT(
         .replace(/(^-|-$)/g, '');
     }
 
-    const updateData: any = {
+    const updateData = {
       title,
-      titleEs: titleEs || null,
-      titleEn: titleEn || null,
+      titleEs,
+      titleEn,
       slug,
       content,
-      contentEs: contentEs || null,
-      contentEn: contentEn || null,
+      contentEs,
+      contentEn,
       category,
       platform,
-      coverImage: coverImage || null,
-      imageData: imageData || null,
-      imageMimeType: imageMimeType || null,
+      coverImage,
+      imageData,
+      imageMimeType,
       status,
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      rating: rating ? parseFloat(rating.toString()) : undefined
     };
 
-    console.log('Update data:', JSON.stringify(updateData, null, 2));
-
-    if (rating) {
-      updateData.rating = parseFloat(rating);
-    }
+    logger.info('Updating review', { 
+      id: params.id, 
+      title, 
+      category, 
+      authorId: user.id 
+    });
 
     const updatedReview = await prisma.review.update({
       where: { id: params.id },
@@ -130,11 +210,42 @@ export async function PUT(
       }
     });
 
+    logger.info('Review updated successfully', { 
+      id: updatedReview.id, 
+      title: updatedReview.title 
+    });
+
     return NextResponse.json(updatedReview);
   } catch (error) {
-    console.error('Error updating review:', error);
+    logger.error('Error updating review', error as Error, {
+      userEmail: session?.user?.email,
+      reviewId: params.id
+    });
+    
+    // Check for specific Prisma errors
+    if (error instanceof Error) {
+      if (error.message.includes('Unique constraint')) {
+        return NextResponse.json(
+          { error: 'A review with this slug already exists' },
+          { status: 409 }
+        );
+      }
+      if (error.message.includes('Foreign key constraint')) {
+        return NextResponse.json(
+          { error: 'Invalid user reference' },
+          { status: 400 }
+        );
+      }
+      if (error.message.includes('Record to update not found')) {
+        return NextResponse.json(
+          { error: 'Review not found' },
+          { status: 404 }
+        );
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to update review' },
+      { error: 'Failed to update review', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -145,10 +256,20 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  let session;
+  
   try {
-    const session = await getServerSession(authOptions);
+    logger.info('DELETE /api/reviews/[id] - Starting request processing', { id: params.id });
+    
+    session = await getServerSession(authOptions);
+    logger.info('Session result:', { hasSession: !!session, email: session?.user?.email });
     
     if (!session?.user?.email) {
+      logger.warn('Unauthorized review deletion attempt', { 
+        id: params.id,
+        ip: request.ip, 
+        path: request.nextUrl.pathname 
+      });
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -156,12 +277,14 @@ export async function DELETE(
     }
 
     // Check if review exists and user has permission
+    logger.info('Finding existing review', { id: params.id });
     const existingReview = await prisma.review.findUnique({
       where: { id: params.id },
       include: { author: true }
     });
 
     if (!existingReview) {
+      logger.warn('Review not found', { id: params.id });
       return NextResponse.json(
         { error: 'Review not found' },
         { status: 404 }
@@ -169,29 +292,60 @@ export async function DELETE(
     }
 
     // Check if user is the author or has admin role
+    logger.info('Finding user in database', { email: session.user.email });
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
     });
 
-    if (!user || (existingReview.authorId !== user.id && user.role !== 'admin')) {
+    if (!user) {
+      logger.error(`User not found during review deletion. Email: ${session.user.email}`);
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    if (existingReview.authorId !== user.id && user.role !== 'admin') {
+      logger.warn('Forbidden review deletion attempt', { 
+        reviewId: params.id,
+        reviewAuthorId: existingReview.authorId,
+        userId: user.id,
+        userRole: user.role
+      });
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }
       );
     }
 
+    logger.info('Deleting review', { id: params.id, title: existingReview.title });
     await prisma.review.delete({
       where: { id: params.id }
     });
 
+    logger.info('Review deleted successfully', { id: params.id });
     return NextResponse.json(
       { message: 'Review deleted successfully' },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error deleting review:', error);
+    logger.error('Error deleting review', error as Error, {
+      userEmail: session?.user?.email,
+      reviewId: params.id
+    });
+    
+    // Check for specific Prisma errors
+    if (error instanceof Error) {
+      if (error.message.includes('Record to delete does not exist')) {
+        return NextResponse.json(
+          { error: 'Review not found' },
+          { status: 404 }
+        );
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to delete review' },
+      { error: 'Failed to delete review', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
