@@ -19,6 +19,12 @@ export const reviewSchema = z.object({
   coverImage: z.string().url().optional().nullable(),
   imageData: z.string().optional().nullable(),
   imageMimeType: z.string().optional().nullable(),
+  youtubeUrl: z.string().url().optional().nullable().refine((val) => {
+    if (!val) return true; // Allow empty/null values
+    return val.includes('youtube.com/watch?v=') || val.includes('youtu.be/') || val.includes('youtube.com/embed/');
+  }, {
+    message: "Must be a valid YouTube URL"
+  }),
   status: z.enum(['draft', 'published', 'archived']).default('draft'),
 });
 

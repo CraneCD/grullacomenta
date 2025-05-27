@@ -18,6 +18,7 @@ interface ReviewFormData {
   coverImage: string;
   imageData?: string;
   imageMimeType?: string;
+  youtubeUrl?: string;
   status: 'draft' | 'published';
 }
 
@@ -32,6 +33,7 @@ const initialFormData: ReviewFormData = {
   contentEn: '',
   rating: undefined,
   coverImage: '',
+  youtubeUrl: '',
   status: 'draft'
 };
 
@@ -74,6 +76,7 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
           coverImage: review.coverImage || '',
           imageData: review.imageData,
           imageMimeType: review.imageMimeType,
+          youtubeUrl: review.youtubeUrl || '',
           status: review.status
         });
         
@@ -457,6 +460,25 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
               placeholder="Leave empty if no rating"
               className="w-full px-4 py-2 bg-[#1a1a1a] border border-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             />
+          </div>
+
+          {/* YouTube URL */}
+          <div className="space-y-2">
+            <label htmlFor="youtubeUrl" className="block text-sm font-medium text-gray-300">
+              YouTube Video URL - Optional
+            </label>
+            <input
+              type="url"
+              id="youtubeUrl"
+              name="youtubeUrl"
+              value={formData.youtubeUrl}
+              onChange={handleChange}
+              placeholder="https://www.youtube.com/watch?v=..."
+              className="w-full px-4 py-2 bg-[#1a1a1a] border border-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+            />
+            <p className="text-xs text-gray-400">
+              Add a YouTube video to embed in your review. Supports youtube.com/watch, youtu.be, and youtube.com/embed URLs.
+            </p>
           </div>
 
           {/* Cover Image */}

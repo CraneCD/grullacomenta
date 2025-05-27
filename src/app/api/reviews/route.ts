@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     
     // Type assertion for the validated data
     const validatedData = validationResult.data as z.infer<typeof reviewSchema>;
-    const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = validatedData;
+    const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, youtubeUrl, status } = validatedData;
 
     // Find the user
     logger.info('Finding user in database', { email: session.user.email });
@@ -204,6 +204,7 @@ export async function POST(request: NextRequest) {
       coverImage,
       imageData,
       imageMimeType,
+      youtubeUrl,
       status,
       authorId: user.id,
       rating: rating ? parseFloat(rating.toString()) : undefined
@@ -223,7 +224,7 @@ export async function POST(request: NextRequest) {
       const insertResult = await prisma.$executeRaw`
         INSERT INTO "Review" (
           id, title, "titleEs", "titleEn", slug, content, "contentEs", "contentEn", 
-          category, platform, "coverImage", "imageData", "imageMimeType", status, 
+          category, platform, "coverImage", "imageData", "imageMimeType", "youtubeUrl", status, 
           rating, "authorId", "createdAt", "updatedAt"
         ) VALUES (
           ${reviewId},
@@ -239,6 +240,7 @@ export async function POST(request: NextRequest) {
           ${coverImage || null},
           ${imageData || null},
           ${imageMimeType || null},
+          ${youtubeUrl || null},
           ${status},
           ${rating || null},
           ${user.id},
