@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Force fresh deployment - ensure youtubeUrl is included
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest) {
       coverImage: review.coverImage,
       imageData: review.imageData ? 'uploaded' : null, // Don't send actual data, just indicate if it exists
       imageMimeType: review.imageMimeType,
-      youtubeUrl: review.youtubeUrl,
+      youtubeUrl: review.youtubeUrl, // Ensure this field is included
       date: review.createdAt,
       updatedAt: review.updatedAt, // Add updatedAt for cache busting
       slug: review.slug,
