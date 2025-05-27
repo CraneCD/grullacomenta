@@ -47,6 +47,22 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'imgsrv.crunchyroll.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images3.alphacoders.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.alphacoders.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.myanimelist.net',
       }
     ],
   },
