@@ -47,6 +47,7 @@
   },
   "reviews": {
     "title": "Posts",
+    "description": "Explore all our posts about anime, manga, and video games. Discover our latest opinions and recommendations.",
     "readMore": "Read more",
     "rating": "Rating",
     "category": "Category",
@@ -73,7 +74,9 @@
     "platformPlayStation": "PlayStation",
     "platformXbox": "Xbox",
     "platformNintendo": "Nintendo",
-    "platformPC": "PC"
+    "platformPC": "PC",
+    "comingSoon": "Coming Soon",
+    "reviewsListingMessage": "We're working on displaying a complete list of all our posts. Check back soon!"
   },
   "categories": {
     "anime": "Anime and Manga",
