@@ -76,7 +76,10 @@
     "platformNintendo": "Nintendo",
     "platformPC": "PC",
     "comingSoon": "Coming Soon",
-    "reviewsListingMessage": "We're working on displaying a complete list of all our posts. Check back soon!"
+    "reviewsListingMessage": "We're working on displaying a complete list of all our posts. Check back soon!",
+    "clearFilters": "Clear filters",
+    "searchPlaceholder": "Search posts...",
+    "resultsFor": "for"
   },
   "categories": {
     "anime": "Anime and Manga",
