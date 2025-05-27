@@ -47,6 +47,7 @@
   },
   "reviews": {
     "title": "Publicaciones",
+    "description": "Explora todas nuestras publicaciones sobre anime, manga y videojuegos. Descubre nuestras últimas opiniones y recomendaciones.",
     "readMore": "Leer más",
     "rating": "Calificación",
     "category": "Categoría",
@@ -73,7 +74,9 @@
     "platformPlayStation": "PlayStation",
     "platformXbox": "Xbox",
     "platformNintendo": "Nintendo",
-    "platformPC": "PC"
+    "platformPC": "PC",
+    "comingSoon": "Próximamente",
+    "reviewsListingMessage": "Estamos trabajando en mostrar una lista completa de todas nuestras publicaciones. ¡Vuelve pronto!"
   },
   "categories": {
     "anime": "Anime y Manga",
