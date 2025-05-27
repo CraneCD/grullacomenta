@@ -41,6 +41,14 @@ export async function GET(request: NextRequest) {
     }
 
     const reviews = await prisma.review.findMany(queryOptions);
+    
+    // Debug logging for production
+    console.log('DEBUG: Raw reviews from database:', JSON.stringify(reviews, null, 2));
+    if (reviews.length > 0) {
+      const firstReview = reviews[0] as any;
+      console.log('DEBUG: First review youtubeUrl:', firstReview.youtubeUrl);
+      console.log('DEBUG: First review keys:', Object.keys(firstReview));
+    }
 
     // Transform the data to match the expected format
     const transformedReviews = reviews.map((review: any) => ({
@@ -62,6 +70,9 @@ export async function GET(request: NextRequest) {
       status: review.status,
       authorName: review.author.name
     }));
+
+    // Debug logging for transformed data
+    console.log('DEBUG: Transformed reviews:', JSON.stringify(transformedReviews, null, 2));
 
     return NextResponse.json(transformedReviews);
   } catch (error) {
