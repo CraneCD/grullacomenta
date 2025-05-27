@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
       coverImage: review.coverImage,
       imageData: review.imageData ? 'uploaded' : null,
       imageMimeType: review.imageMimeType,
+      youtubeUrl: review.youtubeUrl,
       date: review.createdAt,
       updatedAt: review.updatedAt,
       slug: review.slug,
