@@ -16,6 +16,7 @@ interface Review {
   coverImage?: string;
   imageData?: string;
   imageMimeType?: string;
+  youtubeUrl?: string;
   date: string | Date;
   updatedAt?: string | Date;
   slug: string;

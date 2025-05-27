@@ -118,7 +118,7 @@ export async function PUT(
 
     // Type assertion for the validated data
     const validatedData = validationResult.data as z.infer<typeof reviewSchema>;
-    const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = validatedData;
+    const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, youtubeUrl, status } = validatedData;
 
     // Check if review exists and user has permission
     logger.info('Finding existing review', { id: params.id });
@@ -185,6 +185,7 @@ export async function PUT(
       coverImage,
       imageData,
       imageMimeType,
+      youtubeUrl,
       status,
       updatedAt: new Date(),
       rating: rating ? parseFloat(rating.toString()) : undefined
@@ -214,6 +215,7 @@ export async function PUT(
           "coverImage" = ${coverImage || null},
           "imageData" = ${imageData || null},
           "imageMimeType" = ${imageMimeType || null},
+          "youtubeUrl" = ${youtubeUrl || null},
           status = ${status},
           rating = ${rating || null},
           "updatedAt" = NOW()

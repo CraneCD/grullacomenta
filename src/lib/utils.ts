@@ -68,4 +68,40 @@ export function hasTitleForLocale(review: ReviewTitle, locale: string): boolean 
     return !!(review.titleEn || review.title);
   }
   return !!review.title;
+}
+
+/**
+ * Extract YouTube video ID from various YouTube URL formats
+ */
+export function extractYouTubeVideoId(url: string): string | null {
+  if (!url) return null;
+  
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /youtube\.com\/watch\?.*v=([^&\n?#]+)/
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * Create YouTube embed URL from video ID
+ */
+export function createYouTubeEmbedUrl(videoId: string): string {
+  return `https://www.youtube.com/embed/${videoId}`;
+}
+
+/**
+ * Check if a URL is a valid YouTube URL
+ */
+export function isValidYouTubeUrl(url: string): boolean {
+  if (!url) return false;
+  return extractYouTubeVideoId(url) !== null;
 } 

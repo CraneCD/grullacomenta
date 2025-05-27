@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useTranslations, useLocale } from 'next-intl';
 import ReviewGrid from '@/components/ReviewGrid';
-import { getLocalizedContent, hasContentForLocale, getLocalizedTitle, hasTitleForLocale } from '@/lib/utils';
+import { getLocalizedContent, hasContentForLocale, getLocalizedTitle, hasTitleForLocale, extractYouTubeVideoId, createYouTubeEmbedUrl } from '@/lib/utils';
 
 interface Review {
   id: string;
@@ -19,6 +19,7 @@ interface Review {
   coverImage?: string;
   imageData?: string;
   imageMimeType?: string;
+  youtubeUrl?: string;
   createdAt: string;
   updatedAt?: string;
   slug: string;
@@ -179,6 +180,37 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
               )
             ))}
           </div>
+
+          {/* YouTube Video Embed */}
+          {review.youtubeUrl && (
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold text-white mb-4">
+                {locale === 'es' ? 'Video relacionado' : 'Related Video'}
+              </h3>
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+                {(() => {
+                  const videoId = extractYouTubeVideoId(review.youtubeUrl);
+                  if (videoId) {
+                    return (
+                      <iframe
+                        src={createYouTubeEmbedUrl(videoId)}
+                        title="YouTube video"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="absolute inset-0 w-full h-full"
+                      />
+                    );
+                  } else {
+                    return (
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                        <p>{locale === 'es' ? 'URL de video inválida' : 'Invalid video URL'}</p>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
+            </div>
+          )}
         </div>
       </article>
 

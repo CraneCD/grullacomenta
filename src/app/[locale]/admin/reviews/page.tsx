@@ -13,6 +13,7 @@ interface Review {
   titleEn?: string;
   category: string;
   platform?: string;
+  youtubeUrl?: string;
   rating?: number;
   status: string;
   createdAt: string;
