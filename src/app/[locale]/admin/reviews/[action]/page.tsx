@@ -63,7 +63,7 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
         const review = await response.json();
         setFormData({
           title: review.title,
-          titleEs: review.titleEs || review.title || '',
+          titleEs: review.titleEs || '',
           titleEn: review.titleEn || '',
           category: review.category,
           platform: review.platform || '',
@@ -107,8 +107,8 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
       return;
     }
 
-    // Validate that at least one language title is provided
-    if (!formData.titleEs && !formData.titleEn) {
+    // Validate that at least one language title is provided (or has main title for backward compatibility)
+    if (!formData.titleEs && !formData.titleEn && !formData.title) {
       alert('Please provide a title in at least one language (Spanish or English)');
       return;
     }

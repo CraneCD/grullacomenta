@@ -56,6 +56,7 @@ export async function PUT(
     }
 
     const body = await request.json();
+    console.log('Received body:', JSON.stringify(body, null, 2));
     const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = body;
 
     // Check if review exists and user has permission
@@ -95,20 +96,22 @@ export async function PUT(
 
     const updateData: any = {
       title,
-      titleEs,
-      titleEn,
+      titleEs: titleEs || null,
+      titleEn: titleEn || null,
       slug,
       content,
-      contentEs,
-      contentEn,
+      contentEs: contentEs || null,
+      contentEn: contentEn || null,
       category,
       platform,
-      coverImage,
-      imageData,
-      imageMimeType,
+      coverImage: coverImage || null,
+      imageData: imageData || null,
+      imageMimeType: imageMimeType || null,
       status,
       updatedAt: new Date()
     };
+
+    console.log('Update data:', JSON.stringify(updateData, null, 2));
 
     if (rating) {
       updateData.rating = parseFloat(rating);
