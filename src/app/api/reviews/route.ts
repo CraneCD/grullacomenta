@@ -166,9 +166,30 @@ export async function POST(request: NextRequest) {
 
     // Generate slug from primary title (Spanish first, then English, fallback to title)
     const primaryTitle = titleEs || titleEn || title;
-    const slug = primaryTitle.toLowerCase()
+    let slug = primaryTitle.toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
+
+    // Check if slug already exists and make it unique if needed
+    const existingSlugs = await prisma.$queryRaw`
+      SELECT slug FROM "Review" WHERE slug LIKE ${slug + '%'}
+    ` as { slug: string }[];
+    
+    if (existingSlugs.length > 0) {
+      const slugNumbers = existingSlugs
+        .map(s => s.slug)
+        .filter(s => s.startsWith(slug))
+        .map(s => {
+          const match = s.match(new RegExp(`^${slug}(?:-(\\d+))?$`));
+          return match ? (match[1] ? parseInt(match[1]) : 0) : -1;
+        })
+        .filter(n => n >= 0);
+      
+      const maxNumber = slugNumbers.length > 0 ? Math.max(...slugNumbers) : -1;
+      if (maxNumber >= 0) {
+        slug = `${slug}-${maxNumber + 1}`;
+      }
+    }
 
     const reviewData = {
       title,
@@ -194,24 +215,96 @@ export async function POST(request: NextRequest) {
       authorId: user.id 
     });
 
-    const review = await prisma.review.create({
-      data: reviewData,
-      include: {
+    // Use raw SQL as a workaround for schema issues
+    try {
+      // Generate a unique ID for the new review
+      const reviewId = `cmb${Date.now()}${Math.random().toString(36).substring(2, 15)}`;
+      
+      const insertResult = await prisma.$executeRaw`
+        INSERT INTO "Review" (
+          id, title, "titleEs", "titleEn", slug, content, "contentEs", "contentEn", 
+          category, platform, "coverImage", "imageData", "imageMimeType", status, 
+          rating, "authorId", "createdAt", "updatedAt"
+        ) VALUES (
+          ${reviewId},
+          ${title},
+          ${titleEs || null},
+          ${titleEn || null},
+          ${slug},
+          ${content},
+          ${contentEs || null},
+          ${contentEn || null},
+          ${category},
+          ${platform || null},
+          ${coverImage || null},
+          ${imageData || null},
+          ${imageMimeType || null},
+          ${status},
+          ${rating || null},
+          ${user.id},
+          NOW(),
+          NOW()
+        )
+      `;
+      
+      logger.info('Raw SQL insert successful', { insertResult, reviewId });
+      
+      // Get the created review with author information
+      const createdReviewData = await prisma.$queryRaw`
+        SELECT r.*, u.name as author_name, u.email as author_email
+        FROM "Review" r
+        JOIN "User" u ON r."authorId" = u.id
+        WHERE r.id = ${reviewId}
+        LIMIT 1
+      ` as any[];
+      
+      if (createdReviewData.length === 0) {
+        throw new Error('Review not found after creation');
+      }
+      
+      const reviewResult = createdReviewData[0];
+      const review = {
+        ...reviewResult,
         author: {
-          select: {
-            name: true,
-            email: true
+          name: reviewResult.author_name,
+          email: reviewResult.author_email
+        }
+      };
+      
+      // Clean up the flat fields
+      delete review.author_name;
+      delete review.author_email;
+      
+      logger.info('Review created successfully via raw SQL', { 
+        id: review.id, 
+        title: review.title 
+      });
+
+      return NextResponse.json(review, { status: 201 });
+      
+    } catch (rawSqlError) {
+      logger.error('Raw SQL insert failed, trying ORM fallback', rawSqlError as Error);
+      
+      // Fallback to ORM (might fail but let's try)
+      const review = await prisma.review.create({
+        data: reviewData,
+        include: {
+          author: {
+            select: {
+              name: true,
+              email: true
+            }
           }
         }
-      }
-    });
+      });
 
-    logger.info('Review created successfully', { 
-      id: review.id, 
-      title: review.title 
-    });
+      logger.info('Review created successfully via ORM fallback', { 
+        id: review.id, 
+        title: review.title 
+      });
 
-    return NextResponse.json(review, { status: 201 });
+      return NextResponse.json(review, { status: 201 });
+    }
   } catch (error) {
     logger.error('Error creating review', error as Error, {
       userEmail: session?.user?.email,
