@@ -36,7 +36,7 @@ export default function ReviewsPage() {
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [availablePlatforms, setAvailablePlatforms] = useState<string[]>([]);
   
-  const t = useTranslations('Reviews');
+  const t = useTranslations('reviews');
   const locale = useLocale();
 
   useEffect(() => {
