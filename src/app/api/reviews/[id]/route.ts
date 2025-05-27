@@ -56,7 +56,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { title, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = body;
+    const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = body;
 
     // Check if review exists and user has permission
     const existingReview = await prisma.review.findUnique({
@@ -83,16 +83,20 @@ export async function PUT(
       );
     }
 
-    // Generate new slug if title changed
+    // Generate new slug if primary title changed
+    const primaryTitle = titleEs || titleEn || title;
+    const existingPrimaryTitle = (existingReview as any).titleEs || (existingReview as any).titleEn || existingReview.title;
     let slug = existingReview.slug;
-    if (title !== existingReview.title) {
-      slug = title.toLowerCase()
+    if (primaryTitle !== existingPrimaryTitle) {
+      slug = primaryTitle.toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
     }
 
     const updateData: any = {
       title,
+      titleEs,
+      titleEn,
       slug,
       content,
       contentEs,

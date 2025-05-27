@@ -8,6 +8,8 @@ import { useLocale } from 'next-intl';
 interface Review {
   id: string;
   title: string;
+  titleEs?: string;
+  titleEn?: string;
   category: string;
   platform?: string;
   coverImage?: string;
@@ -41,6 +43,17 @@ export default function ReviewGrid({ reviews, showCategory = true }: ReviewGridP
     return review.coverImage || '/images/placeholder.jpg';
   };
 
+  const getLocalizedTitle = (review: Review) => {
+    // Return the title based on current locale
+    if (locale === 'es') {
+      return review.titleEs || review.title;
+    } else if (locale === 'en') {
+      return review.titleEn || review.title;
+    }
+    // Fallback to default title
+    return review.title;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {reviews.map((review) => (
@@ -60,7 +73,7 @@ export default function ReviewGrid({ reviews, showCategory = true }: ReviewGridP
           </div>
           <div className="p-4">
             <h3 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2">
-              {review.title}
+              {getLocalizedTitle(review)}
             </h3>
             {showCategory && (
               <p className="text-sm font-medium text-gray-300 mt-1">

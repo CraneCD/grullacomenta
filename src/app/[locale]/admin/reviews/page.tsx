@@ -8,6 +8,8 @@ import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 interface Review {
   id: string;
   title: string;
+  titleEs?: string;
+  titleEn?: string;
   category: string;
   platform?: string;
   rating?: number;
@@ -76,8 +78,20 @@ export default function ReviewsPage() {
     }
   };
 
+  const getLocalizedTitle = (review: Review) => {
+    // Return the title based on current locale
+    if (locale === 'es') {
+      return review.titleEs || review.title;
+    } else if (locale === 'en') {
+      return review.titleEn || review.title;
+    }
+    // Fallback to default title
+    return review.title;
+  };
+
   const filteredReviews = reviews.filter(review => {
-    const matchesSearch = review.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const localizedTitle = getLocalizedTitle(review);
+    const matchesSearch = localizedTitle.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || review.category.toLowerCase().includes(categoryFilter.toLowerCase());
     const matchesStatus = !statusFilter || review.status.toLowerCase() === statusFilter.toLowerCase();
     
@@ -151,7 +165,8 @@ export default function ReviewsPage() {
             <tr className="border-b border-gray-800">
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Title</th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Category</th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Languages</th>
+              <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Titles</th>
+              <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Content</th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Rating</th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Status</th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Date</th>
@@ -164,13 +179,27 @@ export default function ReviewsPage() {
                 <tr key={review.id} className="hover:bg-[#2d2d2d] transition-colors">
                   <td className="px-6 py-4">
                     <div>
-                      <div className="text-white font-medium">{review.title}</div>
+                      <div className="text-white font-medium">{getLocalizedTitle(review)}</div>
                       {review.platform && (
                         <div className="text-sm text-gray-400">{review.platform}</div>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4 text-gray-300">{formatCategory(review.category)}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex space-x-1">
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                        review.titleEs ? 'bg-green-400/10 text-green-400' : 'bg-gray-400/10 text-gray-400'
+                      }`}>
+                        🇪🇸
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                        review.titleEn ? 'bg-green-400/10 text-green-400' : 'bg-gray-400/10 text-gray-400'
+                      }`}>
+                        🇺🇸
+                      </span>
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     <div className="flex space-x-1">
                       <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
@@ -214,7 +243,7 @@ export default function ReviewsPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center">
+                <td colSpan={8} className="px-6 py-12 text-center">
                   <div className="text-gray-400">
                     <div className="text-lg font-medium mb-2">No reviews found</div>
                     <div className="text-sm">
