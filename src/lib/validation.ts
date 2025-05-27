@@ -2,18 +2,23 @@ import { z } from 'zod';
 
 // Review validation schema
 export const reviewSchema = z.object({
-  title: z.string().min(3).max(100),
-  titleEs: z.string().min(3).max(100).optional(),
-  titleEn: z.string().min(3).max(100).optional(),
-  content: z.string().min(10),
-  contentEs: z.string().min(10).optional(),
-  contentEn: z.string().min(10).optional(),
+  title: z.string().min(3).max(200),
+  titleEs: z.string().min(3).max(200).optional(),
+  titleEn: z.string().min(3).max(200).optional(),
+  content: z.string().min(10).max(50000),
+  contentEs: z.string().min(10).max(50000).optional(),
+  contentEn: z.string().min(10).max(50000).optional(),
   category: z.string().min(1),
-  platform: z.string().optional(),
-  rating: z.number().min(0).max(10).optional(),
-  coverImage: z.string().url().optional(),
-  imageData: z.string().optional(),
-  imageMimeType: z.string().optional(),
+  platform: z.string().optional().nullable(),
+  rating: z.union([z.number(), z.string()]).transform((val) => {
+    const num = typeof val === 'string' ? parseFloat(val) : val;
+    return isNaN(num) ? undefined : num;
+  }).refine((val) => val === undefined || (val >= 0 && val <= 10), {
+    message: "Rating must be between 0 and 10"
+  }).optional(),
+  coverImage: z.string().url().optional().nullable(),
+  imageData: z.string().optional().nullable(),
+  imageMimeType: z.string().optional().nullable(),
   status: z.enum(['draft', 'published', 'archived']).default('draft'),
 });
 
