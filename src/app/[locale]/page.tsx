@@ -40,15 +40,15 @@ export default function Home() {
   const fetchReviews = async () => {
     try {
       // Fetch anime reviews
-      const animeResponse = await fetch('/api/public/reviews?category=anime&limit=2');
+      const animeResponse = await fetch('/api/public/reviews?category=anime&limit=5');
       const animeData = animeResponse.ok ? await animeResponse.json() : [];
 
       // Fetch manga reviews
-      const mangaResponse = await fetch('/api/public/reviews?category=manga&limit=2');
+      const mangaResponse = await fetch('/api/public/reviews?category=manga&limit=5');
       const mangaData = mangaResponse.ok ? await mangaResponse.json() : [];
 
       // Fetch video game reviews
-      const videoGameResponse = await fetch('/api/public/reviews?category=video-games&limit=2');
+      const videoGameResponse = await fetch('/api/public/reviews?category=video-games&limit=5');
       const videoGameData = videoGameResponse.ok ? await videoGameResponse.json() : [];
 
       setAnimeReviews(animeData);
@@ -62,7 +62,7 @@ export default function Home() {
   };
 
   // Combine anime and manga reviews for the anime-manga section
-  const animeMangaReviews = [...animeReviews, ...mangaReviews].slice(0, 4);
+  const animeMangaReviews = [...animeReviews, ...mangaReviews].slice(0, 10);
 
   if (loading) {
     return (
