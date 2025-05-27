@@ -7,11 +7,13 @@ import { format } from 'date-fns';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useTranslations, useLocale } from 'next-intl';
 import ReviewGrid from '@/components/ReviewGrid';
-import { getLocalizedContent, hasContentForLocale } from '@/lib/utils';
+import { getLocalizedContent, hasContentForLocale, getLocalizedTitle, hasTitleForLocale } from '@/lib/utils';
 
 interface Review {
   id: string;
   title: string;
+  titleEs?: string;
+  titleEn?: string;
   category: string;
   platform?: string;
   coverImage?: string;
@@ -96,6 +98,9 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
       </div>
     );
   }
+
+  const localizedTitle = getLocalizedTitle(review, locale);
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-6">
@@ -112,7 +117,7 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
         <div className="relative aspect-video w-full overflow-hidden rounded-lg">
           <Image
             src={getImageSrc(review)}
-            alt={review.title}
+            alt={localizedTitle}
             fill
             className="object-cover"
             priority
@@ -122,7 +127,7 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
         <div className="space-y-6">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">{review.title}</h1>
+              <h1 className="text-4xl font-bold text-white mb-2">{localizedTitle}</h1>
               <p className="text-gray-400 text-lg">{review.category}</p>
             </div>
             <div className="text-right">
@@ -135,8 +140,21 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
             </div>
           </div>
 
-          {/* Content Language Indicator */}
-          <div className="mb-4">
+          {/* Title and Content Language Indicators */}
+          <div className="mb-4 space-y-2">
+            <div className="flex items-center space-x-2 text-sm text-gray-400">
+              <span>📄</span>
+              <span>
+                {locale === 'es' ? 'Título en:' : 'Title in:'} 
+                {locale === 'es' && hasTitleForLocale(review, 'es') ? ' Español' : ''}
+                {locale === 'en' && hasTitleForLocale(review, 'en') ? ' English' : ''}
+                {((locale === 'es' && !hasTitleForLocale(review, 'es')) || 
+                  (locale === 'en' && !hasTitleForLocale(review, 'en'))) && 
+                  hasTitleForLocale(review, locale === 'es' ? 'en' : 'es') ? 
+                  ` ${locale === 'es' ? 'English (fallback)' : 'Español (fallback)'}` : 
+                  ' Original'}
+              </span>
+            </div>
             <div className="flex items-center space-x-2 text-sm text-gray-400">
               <span>📝</span>
               <span>

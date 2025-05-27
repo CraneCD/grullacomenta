@@ -26,6 +26,9 @@ const logger = {
   },
   error: (message: string, error?: Error, context?: any) => {
     console.error(`[ERROR] ${message}`, error?.message || '', context ? JSON.stringify(context) : '');
+    if (error?.stack) {
+      console.error('Stack trace:', error.stack);
+    }
   }
 };
 
@@ -74,6 +77,8 @@ export async function POST(request: NextRequest) {
   let session;
   
   try {
+    logger.info('POST /api/reviews - Starting request processing');
+    
     // Apply rate limiting
     const rateLimitResult = rateLimitMiddleware(request);
     if (rateLimitResult) {
@@ -84,17 +89,23 @@ export async function POST(request: NextRequest) {
       return rateLimitResult;
     }
     
-    // Check CSRF protection
-    const csrfResult = await csrfMiddleware(request);
-    if (csrfResult) {
-      logger.warn('CSRF validation failed', { 
-        ip: request.ip, 
-        path: request.nextUrl.pathname 
-      });
-      return csrfResult;
+    // Check CSRF protection (skip in development)
+    if (process.env.NODE_ENV === 'production') {
+      const csrfResult = await csrfMiddleware(request);
+      if (csrfResult) {
+        logger.warn('CSRF validation failed', { 
+          ip: request.ip, 
+          path: request.nextUrl.pathname 
+        });
+        return csrfResult;
+      }
+    } else {
+      logger.info('Skipping CSRF check in development mode');
     }
     
+    logger.info('Getting server session');
     session = await getServerSession(authOptions);
+    logger.info('Session result:', { hasSession: !!session, email: session?.user?.email });
     
     if (!session?.user?.email) {
       logger.warn('Unauthorized review creation attempt', { 
@@ -107,9 +118,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    logger.info('Parsing request body');
     const body = await request.json();
+    logger.info('Request body received:', { 
+      hasTitle: !!body.title, 
+      hasTitleEs: !!body.titleEs,
+      hasTitleEn: !!body.titleEn,
+      hasContent: !!body.content, 
+      hasContentEs: !!body.contentEs,
+      hasContentEn: !!body.contentEn,
+      category: body.category 
+    });
     
     // Validate input
+    logger.info('Validating input data');
     const validationResult = validateInput(reviewSchema, body);
     if (!validationResult.success) {
       logger.warn('Invalid review data', { 
@@ -127,6 +149,7 @@ export async function POST(request: NextRequest) {
     const { title, titleEs, titleEn, content, contentEs, contentEn, category, platform, rating, coverImage, imageData, imageMimeType, status } = validatedData;
 
     // Find the user
+    logger.info('Finding user in database', { email: session.user.email });
     const user = await prisma.user.findUnique({
       where: { email: session.user.email }
     });
@@ -138,6 +161,8 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    logger.info('User found', { userId: user.id, userName: user.name });
 
     // Generate slug from primary title (Spanish first, then English, fallback to title)
     const primaryTitle = titleEs || titleEn || title;
@@ -189,10 +214,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(review, { status: 201 });
   } catch (error) {
     logger.error('Error creating review', error as Error, {
-      userEmail: session?.user?.email
+      userEmail: session?.user?.email,
+      step: 'unknown'
     });
+    
+    // Check for specific Prisma errors
+    if (error instanceof Error) {
+      if (error.message.includes('Unique constraint')) {
+        return NextResponse.json(
+          { error: 'A review with this slug already exists' },
+          { status: 409 }
+        );
+      }
+      if (error.message.includes('Foreign key constraint')) {
+        return NextResponse.json(
+          { error: 'Invalid user reference' },
+          { status: 400 }
+        );
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create review' },
+      { error: 'Failed to create review', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

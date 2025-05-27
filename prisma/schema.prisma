@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,34 +8,34 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  password      String
-  role          String    @default("user")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  reviews       Review[]
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reviews   Review[]
 }
 
 model Review {
-  id          String    @id @default(cuid())
-  title       String    // Keep for backward compatibility
-  titleEs     String?   // Spanish title
-  titleEn     String?   // English title
-  slug        String    @unique
-  content     String    // Keep for backward compatibility
-  contentEs   String?   // Spanish content
-  contentEn   String?   // English content
-  category    String
-  platform    String?
-  rating      Float?
-  coverImage  String?   // Keep for backward compatibility, will be null for uploaded images
-  imageData   String?   // Base64 encoded image data
-  imageMimeType String? // MIME type of the uploaded image
-  status      String    @default("draft")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  authorId    String
-  author      User      @relation(fields: [authorId], references: [id])
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  content       String
+  contentEs     String?
+  contentEn     String?
+  category      String
+  platform      String?
+  rating        Float?
+  coverImage    String?
+  imageData     String?
+  imageMimeType String?
+  status        String   @default("draft")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  authorId      String
+  titleEn       String?
+  titleEs       String?
+  author        User     @relation(fields: [authorId], references: [id])
 }
