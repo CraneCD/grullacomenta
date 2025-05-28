@@ -110,8 +110,8 @@ export default function Header() {
             <Link href={`/${locale}`} className="flex items-center hover:opacity-90 transition-opacity">
               <Image
                 src="/logo.png"
-                alt="Posts Blog"
-                width={150}
+                alt="Grulla Comenta"
+                width={240}
                 height={40}
                 className="object-contain"
                 priority
