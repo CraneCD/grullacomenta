@@ -22,6 +22,7 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [availableCategories, setAvailableCategories] = useState<CategoryData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const router = useRouter();
   const t = useTranslations('navigation');
   const tCategories = useTranslations('categories');
@@ -98,6 +99,7 @@ export default function Header() {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/${locale}/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowMobileSearch(false);
     }
   };
 
@@ -119,6 +121,7 @@ export default function Header() {
             </Link>
             
             <div className="flex items-center space-x-2 sm:space-x-4">
+              {/* Desktop search */}
               <form onSubmit={handleSearch} className="relative hidden sm:block w-48 md:w-64">
                 <input
                   type="search"
@@ -129,14 +132,10 @@ export default function Header() {
                 />
                 <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               </form>
+              
               {/* Mobile search icon */}
               <button 
-                onClick={() => {
-                  const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
-                  if (searchInput) {
-                    searchInput.focus();
-                  }
-                }}
+                onClick={() => setShowMobileSearch(!showMobileSearch)}
                 className="sm:hidden p-2 text-gray-400 hover:text-white"
               >
                 <MagnifyingGlassIcon className="h-5 w-5" />
@@ -146,6 +145,23 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      {/* Mobile search bar */}
+      {showMobileSearch && (
+        <div className="sm:hidden bg-[#1a1a1a] border-b border-gray-800 px-4 py-3">
+          <form onSubmit={handleSearch} className="relative">
+            <input
+              type="search"
+              placeholder={t('search') || 'Search posts...'}
+              className="w-full px-4 py-2 pr-10 text-sm bg-[#2d2d2d] border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+            <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+          </form>
+        </div>
+      )}
 
       {/* Category Navigation */}
       <div className="border-b border-gray-800">
