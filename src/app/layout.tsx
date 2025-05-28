@@ -11,8 +11,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Reviews Blog",
-  description: "Your personal space for anime, manga, and video game reviews",
+  title: "Grulla Comenta - Anime, Manga y Videojuegos",
+  description: "Grulla Comenta es un blog de comentarios sobre anime, manga y videojuegos.",
+  icons: {
+    icon: '/minilogo.png',
+    shortcut: '/minilogo.png',
+    apple: '/minilogo.png',
+  },
 };
 
 export default function RootLayout({
