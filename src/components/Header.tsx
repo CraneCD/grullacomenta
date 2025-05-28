@@ -111,15 +111,15 @@ export default function Header() {
               <Image
                 src="/logo.png"
                 alt="Grulla Comenta"
-                width={240}
-                height={40}
-                className="object-contain"
+                width={280}
+                height={46}
+                className="object-contain w-48 h-8 sm:w-56 sm:h-9 md:w-64 md:h-10 lg:w-72 lg:h-12"
                 priority
               />
             </Link>
             
-            <div className="flex items-center space-x-4">
-              <form onSubmit={handleSearch} className="relative w-64">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <form onSubmit={handleSearch} className="relative hidden sm:block w-48 md:w-64">
                 <input
                   type="search"
                   placeholder={t('search') || 'Search posts...'}
@@ -129,6 +129,18 @@ export default function Header() {
                 />
                 <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
               </form>
+              {/* Mobile search icon */}
+              <button 
+                onClick={() => {
+                  const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+                  if (searchInput) {
+                    searchInput.focus();
+                  }
+                }}
+                className="sm:hidden p-2 text-gray-400 hover:text-white"
+              >
+                <MagnifyingGlassIcon className="h-5 w-5" />
+              </button>
               <LanguageSwitcher />
             </div>
           </div>
