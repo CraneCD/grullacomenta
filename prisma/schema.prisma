@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reviews   Review[]
+}
+
+model Review {
+  id            String   @id @default(cuid())
+  title         String
+  slug          String   @unique
+  content       String
+  contentEs     String?
+  contentEn     String?
+  category      String
+  platform      String?
+  rating        Float?
+  coverImage    String?
+  imageData     String?
+  imageMimeType String?
+  youtubeUrl    String?
+  status        String   @default("draft")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  authorId      String
+  titleEn       String?
+  titleEs       String?
+  author        User     @relation(fields: [authorId], references: [id])
+}
