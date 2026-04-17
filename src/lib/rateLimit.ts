@@ -66,12 +66,4 @@ export function rateLimitMiddleware(request: NextRequest) {
   return null;
 }
 
-// Clean up expired rate limit data periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, data] of rateLimitStore.entries()) {
-    if (now > data.resetTime) {
-      rateLimitStore.delete(key);
-    }
-  }
-}, 60 * 1000); // Clean up every minute 
+ 

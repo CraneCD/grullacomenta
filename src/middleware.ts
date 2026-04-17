@@ -123,7 +123,7 @@ export default async function middleware(req: NextRequestWithAuth) {
   headers.set('Referrer-Policy', 'origin-when-cross-origin');
   headers.set(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
   );
 
   // Verify CSRF token for non-GET requests (but not for API routes)
