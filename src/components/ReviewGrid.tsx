@@ -75,8 +75,11 @@ export default function ReviewGrid({ reviews, showCategory = true }: ReviewGridP
                 </p>
               )}
               {review.rating && (
-                <p className="text-sm font-medium text-blue-400 mt-1">
-                  ⭐ {review.rating}/10
+                <p
+                  className="text-sm font-medium text-blue-400 mt-1"
+                  aria-label={`Rating: ${review.rating} out of 10`}
+                >
+                  <span aria-hidden="true">⭐ {review.rating}/10</span>
                 </p>
               )}
               <p className="text-sm text-gray-400 mt-2">

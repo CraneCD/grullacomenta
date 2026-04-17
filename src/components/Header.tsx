@@ -134,11 +134,13 @@ export default function Header() {
               </form>
               
               {/* Mobile search icon */}
-              <button 
+              <button
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
                 className="sm:hidden p-2 text-gray-400 hover:text-white"
+                aria-label={t('search')}
+                aria-expanded={showMobileSearch}
               >
-                <MagnifyingGlassIcon className="h-5 w-5" />
+                <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
               </button>
               <LanguageSwitcher />
             </div>
