@@ -1,7 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
+const ALLOWED_IMAGE_HOSTS = [
+  'example.com',
+  'images.unsplash.com',
+  'via.placeholder.com',
+  'picsum.photos',
+  'imgsrv.crunchyroll.com',
+  'images3.alphacoders.com',
+  'i.imgur.com',
+  'cdn.myanimelist.net',
+];
+
+function isAllowedImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') return false;
+    return ALLOWED_IMAGE_HOSTS.some(
+      (host) => parsed.hostname === host || parsed.hostname.endsWith('.' + host)
+    );
+  } catch {
+    return false;
+  }
+}
 
 export async function GET(
   request: NextRequest,
@@ -24,29 +45,30 @@ export async function GET(
       );
     }
 
-    // If there's uploaded image data, serve it
     if (review.imageData && review.imageMimeType) {
       const imageBuffer = Buffer.from(review.imageData, 'base64');
-      
       return new NextResponse(imageBuffer, {
         headers: {
           'Content-Type': review.imageMimeType,
-          'Cache-Control': 'public, max-age=3600, must-revalidate', // Cache for 1 hour but revalidate
+          'Cache-Control': 'public, max-age=3600, must-revalidate',
         },
       });
     }
 
-    // If no uploaded image but has coverImage URL, redirect to it
     if (review.coverImage) {
+      if (!isAllowedImageUrl(review.coverImage)) {
+        return NextResponse.json(
+          { error: 'Image URL not permitted' },
+          { status: 403 }
+        );
+      }
       return NextResponse.redirect(review.coverImage);
     }
 
-    // No image found
     return NextResponse.json(
       { error: 'No image found for this review' },
       { status: 404 }
     );
-
   } catch (error) {
     console.error('Error serving image:', error);
     return NextResponse.json(
@@ -54,4 +76,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

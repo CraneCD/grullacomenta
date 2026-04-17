@@ -1,78 +1,76 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
+const MAX_LIMIT = 100;
 
-// Force fresh deployment - ensure youtubeUrl is included
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
-    const limit = searchParams.get('limit');
+    const rawLimit = searchParams.get('limit');
 
-    // Build the where clause
-    const where: any = {
-      status: 'published' // Only show published reviews
+    const where: { status: string; category?: string } = {
+      status: 'published',
     };
 
-    // Add category filter if specified
     if (category) {
       where.category = category;
     }
 
-    // Build the query options
-    const queryOptions: any = {
+    const take = rawLimit
+      ? Math.min(Math.max(1, parseInt(rawLimit, 10) || 1), MAX_LIMIT)
+      : undefined;
+
+    const reviews = await prisma.review.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        title: true,
+        titleEs: true,
+        titleEn: true,
+        category: true,
+        platform: true,
+        coverImage: true,
+        imageData: true,
+        imageMimeType: true,
+        youtubeUrl: true,
+        slug: true,
+        rating: true,
+        content: true,
+        contentEs: true,
+        contentEn: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
         author: {
-          select: {
-            name: true
-          }
-        }
+          select: { name: true },
+        },
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    };
+      orderBy: { createdAt: 'desc' },
+      ...(take !== undefined ? { take } : {}),
+    });
 
-    // Add limit if specified
-    if (limit) {
-      queryOptions.take = parseInt(limit);
-    }
-
-    const reviews = await prisma.review.findMany(queryOptions);
-    
-    // Debug logging for production
-    console.log('DEBUG: Raw reviews from database:', JSON.stringify(reviews, null, 2));
-    if (reviews.length > 0) {
-      const firstReview = reviews[0] as any;
-      console.log('DEBUG: First review youtubeUrl:', firstReview.youtubeUrl);
-      console.log('DEBUG: First review keys:', Object.keys(firstReview));
-    }
-
-    // Transform the data to match the expected format
-    const transformedReviews = reviews.map((review: any) => ({
+    const transformedReviews = reviews.map((review) => ({
       id: review.id,
       title: review.title,
+      titleEs: review.titleEs,
+      titleEn: review.titleEn,
       category: review.category,
       platform: review.platform,
       coverImage: review.coverImage,
-      imageData: review.imageData ? 'uploaded' : null, // Don't send actual data, just indicate if it exists
+      imageData: review.imageData ? 'uploaded' : null,
       imageMimeType: review.imageMimeType,
-      youtubeUrl: review.youtubeUrl, // Ensure this field is included
+      youtubeUrl: review.youtubeUrl,
       date: review.createdAt,
-      updatedAt: review.updatedAt, // Add updatedAt for cache busting
+      updatedAt: review.updatedAt,
       slug: review.slug,
       rating: review.rating,
       content: review.content,
       contentEs: review.contentEs,
       contentEn: review.contentEn,
       status: review.status,
-      authorName: review.author.name
+      authorName: review.author.name,
     }));
-
-    // Debug logging for transformed data
-    console.log('DEBUG: Transformed reviews:', JSON.stringify(transformedReviews, null, 2));
 
     return NextResponse.json(transformedReviews);
   } catch (error) {
@@ -82,4 +80,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
