@@ -39,11 +39,14 @@
   },
   "home": {
     "title": "Posts Blog",
-    "subtitle": "Your personal space for anime, manga, and video game posts",
+    "subtitle": "Honest, spoiler-free opinions on the series worth watching and reading.",
     "welcomeMessage": "Welcome to our posts blog",
     "latestReviews": "Latest Posts",
     "featuredReviews": "Featured Posts",
-    "noReviews": "No posts available"
+    "noReviews": "No posts available",
+    "viewAllReviews": "View all reviews",
+    "noAnimePosts": "No anime reviews yet.",
+    "noMangaPosts": "No manga reviews yet."
   },
   "reviews": {
     "title": "Posts",
