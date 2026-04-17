@@ -1,0 +1,24 @@
+
+En los shonen de pelea como jujutsu kaisen, no se les da mucho foco o atención a aquellos personajes cuyas habilidades están enfocadas en el soporte, ya que generalmente no cuentan con peleas impresionantes o con escenas de accion impactantes las cuales son adoradas por fans del genero. Sin embargo, yo me atrevería a decir que algunas de las habilidades de soporte que nos dan en Jujutsu Kaisen son mas interesantes que sus pares en otras series, y ameritan su discusión. Mi favorita de ellas es la presentada por Utahime Iori, la supervisora de semi primer grado de la academia de hechiceria de Kyoto.
+
+A diferencia de sus pares en la escuela de hechiceria de Tokyo, Utahime es en realidad una excelente supervisora e instructora, no solo preocupandose por el desarrollo de cada uno de sus estudiantes, sino tomandose enserio el rol, aplicando su meticulosa y estudiosa personalidad a su rol como maestra. Esto causa que los estudiantes de Kyoto la respeten, incluyendo incluso a Todo, dada su experiencia en combate y capacidad analitica, a pesar de ser uno de los personajes mas debil en una pelea uno contra uno.
+
+No podemos olvidar que en el pasado Utahime estudio al mismo tiempo que Gojo, Geto y Mei Mei, participando en misiones con ellos y aprendiendo en carne propia los diferentes aspectos de la caceria de espiritus malditos. Es claro que el control de su energía maldita de Utahime es bastante bueno, asi sea opacada por el resto de sus contemporaneos en la escuela.
+
+Seguro al ver su aspecto y especialmente la forma en la que esta vestida, puedas pensar en Utahime como una especie de sacerdotisa. El particular atuendo de Utahime se llama un Miko, y es la vestimenta tradicional de las sacerdotisas shintoistas, las cuales practican un baile particulpar para calmar los espiritus. Este detalle físico es importante para el funcionamiento de su técnica maldita, la cual tendremos que explicar en un mayor detalle.
+
+Técnica Maldita Innata: Area prohibida individual.
+
+Al activar el Área Prohibida Individual, se crea una zona alrededor del usuario que aumenta su capacidad de energía maldita y suproducción, así como la de cualquier otro hechicero dentro del rango. La técnica puede elevarse a un ritual utilizando incantaciones, gestos con las manos, danza y música. Al incluir todos estos pasos, la efectividad de la técnica puede aumentarse hasta un 120 por ciento, básicamente duplicando la efectividad de cualquier técnica maldita basada en la cantidad de energía maldita utilizada, como por ejemplo el purpura de Gojo.
+
+El Área Prohibida Individual no es particularmente adecuada para el combate, ya que requiere tiempo de preparación y es mejor aplicada para ayudar a los demas mas que para pelear individualmente a pesar de su nombre. Sus aliados no creen que ella sea adecuada para el frente de batalla, pero la técnica de Utahime le permite desempeñar un papel crucial de apoyo en la batalla.
+
+Cuando Gojo enfrentó a su oponente más grande hasta el momento, Sukuna, sus poderes fueron amplificados por la técnica de Utahime. En lugar de omitir pasos por eficiencia, Utahime bailó al ritmo de la música de Gakuganji mientras usaba gestos y palabras para elevar su técnica a un ritual. Esto aumentó la potencia del Área Prohibida Individual al 120 por ciento, utilizando el potencial máximo de Utahime para amplificar la energía maldita de Gojo tanto como fuera posible. Potenciado por el Área Prohibida Individual, Satoru Gojo desató la Técnica Hueca: Púrpura al 200 por ciento de potencia.
+
+Curiosamente esta es la única técnica maldita que hemos visto es amplificada gracias a un ritual, y simultaneamente tambien es la técnica maldita mas lenta en tomar efecto que conocemos. Sin embargo, Utahime y su area prohibida individual son perfectas para batallas planeadas, y puede perfectamente hacer la diferencia en el combate de sus aliados, cosa por la que Gojo la tiene en tan alta estima. 
+
+Aunque he dicho repetidamente que Utahime es relativamente debil en combate uno a uno, no podemos olvidar que Utahime fue entrenada en la mejor escuela de hechicería del mundo, y sus habilidades físicas y de combate cuerpo a cuerpo son bastante buenas, siendo capaz de facilmente esquivar los ataques de Haruta Shigemo. Adicionalmente, Utahime puede amplificarse a si misma con su técnica asi que no es completamente inutil, solo que su rol está mejor diseñado para apoyar a sus aliados mas que para pelear ella misma.
+
+Lastimosamente no hay mucho mas que podamos decir sobre Utahime, a pesar de que me gusta bastante su personaje, su rol como mentora y sobre todo la forma en la que le dan un momento para brillar asi esté enfocada en el soporte. Es un excelente ejemplo de como los personajes como ella no solo son efectivos en batallas importantes, sino que incluso tienen un rol de apoyo escencial en el desarrollo de personajes como Gojo tambien.
+
+

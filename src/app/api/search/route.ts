@@ -1,52 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
+const SEARCH_LIMIT = 50;
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q');
-    
+
     if (!query || query.trim().length === 0) {
       return NextResponse.json([]);
     }
 
     const searchTerm = query.trim();
 
-    // Search in title and content
     const reviews = await prisma.review.findMany({
       where: {
         status: 'published',
         OR: [
-          {
-            title: {
-              contains: searchTerm
-            }
-          },
-          {
-            content: {
-              contains: searchTerm
-            }
-          }
-        ]
+          { title: { contains: searchTerm, mode: 'insensitive' } },
+          { titleEs: { contains: searchTerm, mode: 'insensitive' } },
+          { titleEn: { contains: searchTerm, mode: 'insensitive' } },
+          { content: { contains: searchTerm, mode: 'insensitive' } },
+        ],
       },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        titleEs: true,
+        titleEn: true,
+        category: true,
+        platform: true,
+        coverImage: true,
+        imageData: true,
+        imageMimeType: true,
+        youtubeUrl: true,
+        slug: true,
+        rating: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
         author: {
-          select: {
-            name: true
-          }
-        }
+          select: { name: true },
+        },
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: 'desc' },
+      take: SEARCH_LIMIT,
     });
 
-    // Transform the data to match the expected format
-    const transformedReviews = reviews.map((review: any) => ({
+    const transformedReviews = reviews.map((review) => ({
       id: review.id,
       title: review.title,
+      titleEs: review.titleEs,
+      titleEn: review.titleEn,
       category: review.category,
       platform: review.platform,
       coverImage: review.coverImage,
@@ -57,11 +63,8 @@ export async function GET(request: NextRequest) {
       updatedAt: review.updatedAt,
       slug: review.slug,
       rating: review.rating,
-      content: review.content,
-      contentEs: review.contentEs,
-      contentEn: review.contentEn,
       status: review.status,
-      authorName: review.author.name
+      authorName: review.author.name,
     }));
 
     return NextResponse.json(transformedReviews);
@@ -72,4 +75,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
