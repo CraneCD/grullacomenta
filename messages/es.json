@@ -39,11 +39,14 @@
   },
   "home": {
     "title": "Blog de Publicaciones",
-    "subtitle": "Tu espacio personal para publicaciones de anime, manga y videojuegos",
+    "subtitle": "Opiniones honestas y sin spoilers sobre las series que vale la pena ver y leer.",
     "welcomeMessage": "Bienvenido a nuestro blog de publicaciones",
     "latestReviews": "Últimas Publicaciones",
     "featuredReviews": "Publicaciones Destacadas",
-    "noReviews": "No hay publicaciones disponibles"
+    "noReviews": "No hay publicaciones disponibles",
+    "viewAllReviews": "Ver todas las reseñas",
+    "noAnimePosts": "Todavía no hay reseñas de anime.",
+    "noMangaPosts": "Todavía no hay reseñas de manga."
   },
   "reviews": {
     "title": "Publicaciones",
