@@ -1,30 +1,51 @@
 import { z } from 'zod';
 
+// Coerce empty strings to undefined for optional text fields.
+// The form sends '' for unfilled optional inputs; Zod's .optional() only
+// accepts undefined, so '' would otherwise fail min-length checks.
+const optionalText = (min: number, max: number) =>
+  z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().min(min).max(max).optional()
+  );
+
+// Coerce empty strings to null for optional nullable URL fields.
+const optionalUrl = z.preprocess(
+  (val) => (val === '' ? null : val),
+  z.string().url().optional().nullable()
+);
+
 // Review validation schema
 export const reviewSchema = z.object({
   title: z.string().min(3).max(200),
-  titleEs: z.string().min(3).max(200).optional(),
-  titleEn: z.string().min(3).max(200).optional(),
+  titleEs: optionalText(3, 200),
+  titleEn: optionalText(3, 200),
   content: z.string().min(10).max(50000),
-  contentEs: z.string().min(10).max(50000).optional(),
-  contentEn: z.string().min(10).max(50000).optional(),
+  contentEs: optionalText(10, 50000),
+  contentEn: optionalText(10, 50000),
   category: z.string().min(1),
-  platform: z.string().optional().nullable(),
+  platform: z.preprocess(
+    (val) => (val === '' ? null : val),
+    z.string().optional().nullable()
+  ),
   rating: z.union([z.number(), z.string()]).transform((val) => {
     const num = typeof val === 'string' ? parseFloat(val) : val;
     return isNaN(num) ? undefined : num;
   }).refine((val) => val === undefined || (val >= 0 && val <= 10), {
     message: "Rating must be between 0 and 10"
   }).optional(),
-  coverImage: z.string().url().optional().nullable(),
+  coverImage: optionalUrl,
   imageData: z.string().optional().nullable(),
   imageMimeType: z.string().optional().nullable(),
-  youtubeUrl: z.string().url().optional().nullable().refine((val) => {
-    if (!val) return true; // Allow empty/null values
-    return val.includes('youtube.com/watch?v=') || val.includes('youtu.be/') || val.includes('youtube.com/embed/');
-  }, {
-    message: "Must be a valid YouTube URL"
-  }),
+  youtubeUrl: z.preprocess(
+    (val) => (val === '' ? null : val),
+    z.string().url().optional().nullable().refine((val) => {
+      if (!val) return true;
+      return val.includes('youtube.com/watch?v=') || val.includes('youtu.be/') || val.includes('youtube.com/embed/');
+    }, {
+      message: "Must be a valid YouTube URL"
+    })
+  ),
   status: z.enum(['draft', 'published', 'archived']).default('draft'),
 });
 

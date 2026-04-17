@@ -93,6 +93,13 @@ export default async function middleware(req: NextRequestWithAuth) {
     return intlResponse || NextResponse.next();
   }
 
+  // Skip rate limiting for authenticated users — they are already verified and
+  // Next.js prefetches all visible <Link> hrefs simultaneously, which would
+  // trivially exhaust a per-IP limit on page navigation.
+  if (isAuth) {
+    return intlResponse || NextResponse.next();
+  }
+
   // Get the IP address
   const ip = req.ip ?? '127.0.0.1';
 
