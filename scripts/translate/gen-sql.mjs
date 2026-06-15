@@ -1,4 +1,6 @@
-// Generates scripts/translate/apply.sql from the translated part files.
+// Generates scripts/translate/apply.sql as TWO single statements (console-friendly):
+//  1) one bulk UPDATE ... FROM (VALUES ...) covering all part-file translations
+//  2) one statement for god-complex + complejo-de-dios (both reuse god-complex's English)
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 const applySrc = readFileSync('scripts/translate/apply.mjs', 'utf8');
@@ -10,44 +12,40 @@ const read = (slug, ext) => {
   return existsSync(p) ? readFileSync(p, 'utf8').trim() : null;
 };
 
-// Pick a dollar-quote tag that appears in no content.
 const tag = 'grulla';
 const dq = (s) => {
-  if (s.includes(`$${tag}$`)) throw new Error(`tag collision in content`);
+  if (s.includes(`$${tag}$`)) throw new Error('tag collision');
   return `$${tag}$${s}$${tag}$`;
 };
 
-let out = `-- Apply English translations to the Review table.
--- Generated from scripts/translate/parts/. Run in the Prisma Studio SQL console
--- (or: psql "$DATABASE_URL" -f scripts/translate/apply.sql).
--- Uses dollar-quoting ($${tag}$...$${tag}$) so no escaping is needed.
-
-BEGIN;
-
-`;
-
-let n = 0;
+const rows = [];
 for (const { slug, id } of slugs) {
   const title = read(slug, 'title.txt');
   const body = read(slug, 'body.md');
   if (title === null || body === null) continue;
-  out += `UPDATE "Review" SET "contentEn" = ${dq(body)}, "titleEn" = ${dq(title)} WHERE id = '${id}';\n\n`;
-  n++;
+  rows.push(`  ('${id}', ${dq(body)}, ${dq(title)})`);
 }
 
-// god-complex: content is already English (stored in contentEs).
-out += `UPDATE "Review" SET "contentEn" = "contentEs", "titleEn" = 'God Complex'
-WHERE slug = 'god-complex' AND ("contentEn" IS NULL OR btrim("contentEn") = '');
+let out = `-- Apply English translations to the Review table.
+-- TWO single statements (run each one separately if your SQL console executes
+-- one statement at a time, e.g. Prisma Studio). No BEGIN/COMMIT.
 
-`;
-// complejo-de-dios: Spanish twin of god-complex; reuse god-complex's English.
-out += `UPDATE "Review" SET
-  "contentEn" = (SELECT "contentEs" FROM "Review" WHERE slug = 'god-complex'),
-  "titleEn" = 'God Complex'
-WHERE slug = 'complejo-de-dios' AND ("contentEn" IS NULL OR btrim("contentEn") = '');
+-- 1) Bulk update of all translated reviews (matched by id).
+UPDATE "Review" AS r
+SET "contentEn" = v.body, "titleEn" = v.title
+FROM (VALUES
+${rows.join(',\n')}
+) AS v(id, body, title)
+WHERE r.id = v.id;
 
-COMMIT;
+-- 2) god-complex (already English) and complejo-de-dios (its Spanish twin):
+--    both take god-complex's English contentEs.
+UPDATE "Review" AS r
+SET "contentEn" = src.es, "titleEn" = 'God Complex'
+FROM (SELECT "contentEs" AS es FROM "Review" WHERE slug = 'god-complex') AS src
+WHERE r.slug IN ('god-complex', 'complejo-de-dios')
+  AND (r."contentEn" IS NULL OR btrim(r."contentEn") = '');
 `;
 
 writeFileSync('scripts/translate/apply.sql', out);
-console.log(`Wrote scripts/translate/apply.sql with ${n} part-file UPDATEs + 2 special UPDATEs.`);
+console.log(`Wrote apply.sql: bulk UPDATE with ${rows.length} rows + 1 special UPDATE.`);
