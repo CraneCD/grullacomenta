@@ -1,7 +1,9 @@
-// Generates scripts/translate/apply.sql as TWO single statements (console-friendly):
-//  1) one bulk UPDATE ... FROM (VALUES ...) covering all part-file translations
-//  2) one statement for god-complex + complejo-de-dios (both reuse god-complex's English)
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+// Generates batch SQL files under scripts/translate/batches/.
+// Each file is ONE single statement (a bulk UPDATE ... FROM (VALUES ...)) covering
+// a few reviews, small enough to paste into a one-statement SQL console.
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+
+const BATCH = 4; // reviews per file
 
 const applySrc = readFileSync('scripts/translate/apply.mjs', 'utf8');
 const slugs = [...applySrc.matchAll(/^\s*'([a-z0-9-]+)':\s*'(cmnn[a-z0-9]+)'/gm)]
@@ -11,41 +13,39 @@ const read = (slug, ext) => {
   const p = `scripts/translate/parts/${slug}.${ext}`;
   return existsSync(p) ? readFileSync(p, 'utf8').trim() : null;
 };
-
 const tag = 'grulla';
-const dq = (s) => {
-  if (s.includes(`$${tag}$`)) throw new Error('tag collision');
-  return `$${tag}$${s}$${tag}$`;
-};
+const dq = (s) => { if (s.includes(`$${tag}$`)) throw new Error('tag collision'); return `$${tag}$${s}$${tag}$`; };
 
-const rows = [];
-for (const { slug, id } of slugs) {
-  const title = read(slug, 'title.txt');
-  const body = read(slug, 'body.md');
-  if (title === null || body === null) continue;
-  rows.push(`  ('${id}', ${dq(body)}, ${dq(title)})`);
-}
+const reviews = slugs
+  .map(({ slug, id }) => ({ id, body: read(slug, 'body.md'), title: read(slug, 'title.txt') }))
+  .filter((r) => r.body !== null && r.title !== null);
 
-let out = `-- Apply English translations to the Review table.
--- TWO single statements (run each one separately if your SQL console executes
--- one statement at a time, e.g. Prisma Studio). No BEGIN/COMMIT.
+rmSync('scripts/translate/batches', { recursive: true, force: true });
+mkdirSync('scripts/translate/batches', { recursive: true });
 
--- 1) Bulk update of all translated reviews (matched by id).
-UPDATE "Review" AS r
-SET "contentEn" = v.body, "titleEn" = v.title
+let fileNo = 0;
+for (let i = 0; i < reviews.length; i += BATCH) {
+  fileNo++;
+  const chunk = reviews.slice(i, i + BATCH);
+  const rows = chunk.map((r) => `  ('${r.id}', ${dq(r.body)}, ${dq(r.title)})`).join(',\n');
+  const sql = `-- Batch ${fileNo}: ${chunk.length} reviews. Run this whole file as one statement.
+UPDATE "Review" AS r SET "contentEn" = v.body, "titleEn" = v.title
 FROM (VALUES
-${rows.join(',\n')}
+${rows}
 ) AS v(id, body, title)
 WHERE r.id = v.id;
-
--- 2) god-complex (already English) and complejo-de-dios (its Spanish twin):
---    both take god-complex's English contentEs.
-UPDATE "Review" AS r
-SET "contentEn" = src.es, "titleEn" = 'God Complex'
-FROM (SELECT "contentEs" AS es FROM "Review" WHERE slug = 'god-complex') AS src
-WHERE r.slug IN ('god-complex', 'complejo-de-dios')
-  AND (r."contentEn" IS NULL OR btrim(r."contentEn") = '');
 `;
+  const name = `scripts/translate/batches/apply-${String(fileNo).padStart(2, '0')}.sql`;
+  writeFileSync(name, sql);
+}
 
-writeFileSync('scripts/translate/apply.sql', out);
-console.log(`Wrote apply.sql: bulk UPDATE with ${rows.length} rows + 1 special UPDATE.`);
+// Final batch: the god-complex pair (single statement, no VALUES).
+fileNo++;
+const special = `-- Batch ${fileNo}: god-complex (already English) + complejo-de-dios (its Spanish twin).
+UPDATE "Review" AS r SET "contentEn" = src.es, "titleEn" = 'God Complex'
+FROM (SELECT "contentEs" AS es FROM "Review" WHERE slug = 'god-complex') AS src
+WHERE r.slug IN ('god-complex', 'complejo-de-dios');
+`;
+writeFileSync(`scripts/translate/batches/apply-${String(fileNo).padStart(2, '0')}.sql`, special);
+
+console.log(`Wrote ${fileNo} batch files (BATCH=${BATCH}) to scripts/translate/batches/`);
