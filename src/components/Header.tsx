@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { CraneMark } from './Crane';
 import LanguageSwitcher from './LanguageSwitcher';
 
 interface CategoryData {
@@ -37,7 +37,6 @@ export default function Header() {
       const response = await fetch('/api/categories');
       if (response.ok) {
         const data: AvailableCategoriesResponse = await response.json();
-        console.log('Available categories:', data.categories);
         setAvailableCategories(data.categories);
       }
     } catch (error) {
@@ -49,42 +48,28 @@ export default function Header() {
 
   const buildNavigationItems = () => {
     const items = [];
-    
-    // Always show "All Reviews" if there are any reviews
+
     if (availableCategories.length > 0) {
-      items.push({
-        name: tCategories('all'),
-        href: `/${locale}/reviews`
-      });
+      items.push({ name: tCategories('all'), href: `/${locale}/reviews` });
     }
 
-    // Check if we have anime or manga reviews
     const hasAnime = availableCategories.some(cat => cat.category === 'anime');
     const hasManga = availableCategories.some(cat => cat.category === 'manga');
-    
-    // Show "Anime and Manga" if we have either anime or manga reviews
+
     if (hasAnime || hasManga) {
-      items.push({
-        name: tCategories('anime'),
-        href: `/${locale}/anime-manga`
-      });
+      items.push({ name: tCategories('anime'), href: `/${locale}/anime-manga` });
     }
 
-    // Add video games category and its platforms
     const videoGamesCategory = availableCategories.find(cat => cat.category === 'video-games');
     if (videoGamesCategory) {
-      items.push({
-        name: tCategories('videoGames'),
-        href: `/${locale}/video-games`
-      });
-      
-      // Add platforms for video games if they exist
+      items.push({ name: tCategories('videoGames'), href: `/${locale}/video-games` });
+
       videoGamesCategory.platforms.forEach(platform => {
         const platformKey = platform.toLowerCase();
         if (['playstation', 'xbox', 'nintendo', 'pc'].includes(platformKey)) {
           items.push({
             name: tCategories(platformKey),
-            href: `/${locale}/video-games/${platformKey}`
+            href: `/${locale}/video-games/${platformKey}`,
           });
         }
       });
@@ -104,76 +89,73 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-[#1a1a1a] text-white">
+    <header className="sticky top-0 z-20 bg-paper-50/85 backdrop-blur-md border-b border-border">
       {/* Main Header */}
-      <div className="border-b border-gray-800">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <Link href={`/${locale}`} className="flex items-center hover:opacity-90 transition-opacity">
-              <Image
-                src="/logo.png"
-                alt="Grulla Comenta"
-                width={280}
-                height={46}
-                className="object-contain w-48 h-8 sm:w-56 sm:h-9 md:w-64 md:h-10 lg:w-72 lg:h-12"
-                priority
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-[72px] gap-4">
+          <Link
+            href={`/${locale}`}
+            className="flex items-center gap-2.5 hover:opacity-90 transition-opacity"
+          >
+            <CraneMark size={30} className="text-persimmon-500" />
+            <span className="font-display font-black text-xl sm:text-2xl text-ink-900 tracking-tight">
+              Grulla Comenta
+            </span>
+          </Link>
+
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Desktop search */}
+            <form onSubmit={handleSearch} className="relative hidden sm:block w-48 md:w-64">
+              <input
+                type="search"
+                placeholder={t('search') || 'Buscar ensayos…'}
+                className="w-full px-4 py-1.5 pr-10 text-sm bg-paper-100 border border-border-strong rounded-pill text-ink-900 placeholder-ink-500 focus:outline-none focus:border-persimmon-400 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </Link>
-            
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* Desktop search */}
-              <form onSubmit={handleSearch} className="relative hidden sm:block w-48 md:w-64">
-                <input
-                  type="search"
-                  placeholder={t('search') || 'Search posts...'}
-                  className="w-full px-4 py-1.5 pr-10 text-sm bg-[#2d2d2d] border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-              </form>
-              
-              {/* Mobile search icon */}
-              <button
-                onClick={() => setShowMobileSearch(!showMobileSearch)}
-                className="sm:hidden p-2 text-gray-400 hover:text-white"
-                aria-label={t('search')}
-                aria-expanded={showMobileSearch}
-              >
-                <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <LanguageSwitcher />
-            </div>
+              <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-500 pointer-events-none" />
+            </form>
+
+            {/* Mobile search icon */}
+            <button
+              onClick={() => setShowMobileSearch(!showMobileSearch)}
+              className="sm:hidden p-2 text-ink-500 hover:text-persimmon-500"
+              aria-label={t('search')}
+              aria-expanded={showMobileSearch}
+            >
+              <MagnifyingGlassIcon className="h-5 w-5" aria-hidden="true" />
+            </button>
+            <LanguageSwitcher />
           </div>
         </div>
       </div>
 
       {/* Mobile search bar */}
       {showMobileSearch && (
-        <div className="sm:hidden bg-[#1a1a1a] border-b border-gray-800 px-4 py-3">
+        <div className="sm:hidden bg-paper-50 border-t border-border px-4 py-3">
           <form onSubmit={handleSearch} className="relative">
             <input
               type="search"
-              placeholder={t('search') || 'Search posts...'}
-              className="w-full px-4 py-2 pr-10 text-sm bg-[#2d2d2d] border border-gray-700 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
+              placeholder={t('search') || 'Buscar ensayos…'}
+              className="w-full px-4 py-2 pr-10 text-sm bg-paper-100 border border-border-strong rounded-pill text-ink-900 placeholder-ink-500 focus:outline-none focus:border-persimmon-400 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
             />
-            <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+            <MagnifyingGlassIcon className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-ink-500 pointer-events-none" />
           </form>
         </div>
       )}
 
       {/* Category Navigation */}
-      <div className="border-b border-gray-800">
+      <div className="border-t border-border">
         <nav className="container mx-auto px-4">
-          <div className="flex items-center space-x-6 h-12 overflow-x-auto">
+          <div className="flex items-center gap-1 h-12 overflow-x-auto">
             {!loading && navigationItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-gray-300 hover:text-white whitespace-nowrap transition-colors"
+                className="text-sm font-ui font-bold text-ink-600 hover:text-persimmon-500 hover:bg-paper-200 px-3 py-1.5 rounded-pill whitespace-nowrap transition-colors"
               >
                 {item.name}
               </Link>
@@ -183,4 +165,4 @@ export default function Header() {
       </div>
     </header>
   );
-} 
+}

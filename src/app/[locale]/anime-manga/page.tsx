@@ -74,46 +74,34 @@ export default function AnimeMangaPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-gray-300">{t('loadingReviews')}</div>
+        <div className="text-ink-600">{t('loadingReviews')}</div>
       </div>
     );
   }
+
+  const filterBtn = (filter: string) =>
+    `px-4 py-2 text-sm font-ui font-bold rounded-pill transition-colors ${
+      activeFilter === filter
+        ? 'bg-persimmon-500 text-[#FFF8F0] shadow-sm'
+        : 'text-ink-700 bg-paper-200 hover:bg-paper-300'
+    }`;
+
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white">{t('animeMangaTitle')}</h1>
-        <p className="mt-2 text-gray-300">{t('animeMangaDescription')}</p>
+        <span className="gc-kicker block mb-2">Anime &amp; Manga</span>
+        <h1 className="font-display text-3xl font-bold text-ink-900">{t('animeMangaTitle')}</h1>
+        <p className="mt-2 font-body text-ink-600">{t('animeMangaDescription')}</p>
       </div>
-      
-      <div className="flex space-x-4">
-        <button 
-          onClick={() => handleFilterChange('all')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-            activeFilter === 'all' 
-              ? 'bg-blue-600 text-white' 
-              : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
-          }`}
-        >
+
+      <div className="flex flex-wrap gap-3">
+        <button onClick={() => handleFilterChange('all')} className={filterBtn('all')}>
           {t('filterAll')}
         </button>
-        <button 
-          onClick={() => handleFilterChange('anime')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-            activeFilter === 'anime' 
-              ? 'bg-blue-600 text-white' 
-              : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
-          }`}
-        >
+        <button onClick={() => handleFilterChange('anime')} className={filterBtn('anime')}>
           {t('filterAnime')}
         </button>
-        <button 
-          onClick={() => handleFilterChange('manga')}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-            activeFilter === 'manga' 
-              ? 'bg-blue-600 text-white' 
-              : 'text-gray-700 bg-gray-100 hover:bg-gray-200'
-          }`}
-        >
+        <button onClick={() => handleFilterChange('manga')} className={filterBtn('manga')}>
           {t('filterManga')}
         </button>
       </div>
@@ -121,7 +109,7 @@ export default function AnimeMangaPage() {
       {filteredReviews.length > 0 ? (
         <ReviewGrid reviews={filteredReviews} />
       ) : (
-        <div className="text-center text-gray-400 py-8">
+        <div className="text-center text-ink-500 py-8">
           {activeFilter === 'all' 
             ? t('noReviewsGeneral')
             : t('noReviewsAvailable', { category: activeFilter })

@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useTranslations, useLocale } from 'next-intl';
 import ReviewGrid from '@/components/ReviewGrid';
+import { CraneRating } from '@/components/Crane';
 import { getLocalizedContent, hasContentForLocale, getLocalizedTitle, hasTitleForLocale, extractYouTubeVideoId, createYouTubeEmbedUrl } from '@/lib/utils';
 
 interface Review {
@@ -84,7 +85,7 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-white">{t('loadingReview')}</div>
+        <div className="text-ink-600">{t('loadingReview')}</div>
       </div>
     );
   }
@@ -92,8 +93,8 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
   if (!review) {
     return (
       <div className="text-center py-12">
-        <h1 className="text-2xl font-bold text-white mb-4">{t('reviewNotFound')}</h1>
-        <Link href={`/${locale}`} className="text-blue-400 hover:text-blue-300">
+        <h1 className="text-2xl font-bold text-ink-900 mb-4">{t('reviewNotFound')}</h1>
+        <Link href={`/${locale}`} className="text-persimmon-600 hover:text-persimmon-700 font-ui font-bold">
           {t('returnToHome')}
         </Link>
       </div>
@@ -107,7 +108,7 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
       <div className="mb-6">
         <Link
           href={`/${locale}`}
-          className="inline-flex items-center text-blue-400 hover:text-blue-300 text-sm font-medium"
+          className="inline-flex items-center text-persimmon-600 hover:text-persimmon-700 text-sm font-ui font-bold"
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
           {t('backToReviews')}
@@ -115,7 +116,7 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
       </div>
 
       <article className="space-y-8">
-        <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border shadow-sm bg-paper-200">
           <Image
             src={getImageSrc(review)}
             alt={localizedTitle}
@@ -124,28 +125,27 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
             priority
           />
         </div>
-        
+
         <div className="space-y-6">
-          <div className="flex items-start justify-between">
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">{localizedTitle}</h1>
-              <p className="text-gray-400 text-lg">{review.category}</p>
+              <span className="gc-kicker block mb-2 capitalize">{review.category}</span>
+              <h1 className="font-display text-4xl font-black text-ink-900 mb-0 leading-tight">{localizedTitle}</h1>
             </div>
-            <div className="text-right">
-              {review.rating && (
-                <div className="text-4xl font-bold text-blue-400 mb-2">{review.rating}/10</div>
+            <div className="text-right space-y-2">
+              {typeof review.rating === 'number' && (
+                <CraneRating rating={review.rating} size={24} showValue />
               )}
-              <time className="text-sm text-gray-400">
-                {format(new Date(review.createdAt), 'MMMM d, yyyy')}
+              <time className="block text-sm text-ink-500">
+                {format(new Date(review.createdAt), 'd MMMM yyyy')}
               </time>
             </div>
           </div>
 
           {/* Title and Content Language Indicators */}
-          <div className="mb-4 space-y-2">
-            <div className="flex items-center space-x-2 text-sm text-gray-400">
-              <span>📄</span>
-              <span>
+          <div className="mb-4 space-y-2 border-t border-divider pt-4">
+            <div className="flex items-center space-x-2 text-sm text-ink-500">
+              <span className="font-ui font-bold text-ink-600">
                 {locale === 'es' ? 'Título en:' : 'Title in:'} 
                 {locale === 'es' && hasTitleForLocale(review, 'es') ? ' Español' : ''}
                 {locale === 'en' && hasTitleForLocale(review, 'en') ? ' English' : ''}
@@ -156,9 +156,8 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
                   ' Original'}
               </span>
             </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-400">
-              <span>📝</span>
-              <span>
+            <div className="flex items-center space-x-2 text-sm text-ink-500">
+              <span className="font-ui font-bold text-ink-600">
                 {locale === 'es' ? 'Contenido en:' : 'Content in:'} 
                 {locale === 'es' && hasContentForLocale(review, 'es') ? ' Español' : ''}
                 {locale === 'en' && hasContentForLocale(review, 'en') ? ' English' : ''}
@@ -171,10 +170,10 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
             </div>
           </div>
 
-          <div className="prose prose-invert max-w-none">
+          <div className="gc-prose max-w-prose">
             {getLocalizedContent(review, locale).split('\n').map((paragraph, index) => (
               paragraph.trim() && (
-                <p key={index} className="text-gray-300 text-lg leading-relaxed mb-6">
+                <p key={index} className="mb-6">
                   {paragraph.trim()}
                 </p>
               )
@@ -184,10 +183,10 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
           {/* YouTube Video Embed */}
           {review.youtubeUrl && (
             <div className="mt-8">
-              <h3 className="text-xl font-semibold text-white mb-4">
+              <h3 className="font-display text-xl font-bold text-ink-900 mb-4">
                 {locale === 'es' ? 'Video relacionado' : 'Related Video'}
               </h3>
-              <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
+              <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-border bg-ink-900">
                 {(() => {
                   const videoId = extractYouTubeVideoId(review.youtubeUrl);
                   if (videoId) {
@@ -215,7 +214,7 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
       </article>
 
       <section className="mt-12 space-y-6">
-        <h2 className="text-2xl font-bold text-white">{t('relatedReviews')}</h2>
+        <h2 className="font-display text-2xl font-bold text-ink-900">{t('relatedReviews')}</h2>
         <ReviewGrid reviews={relatedReviews} />
       </section>
     </div>

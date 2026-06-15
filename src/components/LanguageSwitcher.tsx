@@ -33,7 +33,7 @@ export default function LanguageSwitcher() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-1.5 text-sm bg-[#2d2d2d] border border-gray-700 rounded-md text-white hover:bg-[#3d3d3d] transition-colors"
+        className="flex items-center space-x-2 px-3 py-1.5 text-sm font-ui font-bold bg-paper-100 border border-border-strong rounded-pill text-ink-700 hover:bg-paper-200 transition-colors"
       >
         <GlobeAltIcon className="h-4 w-4" />
         <span className="hidden sm:inline">{currentLanguage?.flag}</span>
@@ -42,13 +42,13 @@ export default function LanguageSwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1 w-40 bg-[#2d2d2d] border border-gray-700 rounded-md shadow-lg z-50">
+        <div className="absolute right-0 mt-1 w-40 bg-paper-50 border border-border rounded-md shadow-lg z-50 overflow-hidden">
           {languages.map((language) => (
             <button
               key={language.code}
               onClick={() => switchLanguage(language.code)}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-[#3d3d3d] transition-colors flex items-center space-x-2 ${
-                locale === language.code ? 'bg-[#3d3d3d] text-blue-400' : 'text-white'
+              className={`w-full text-left px-3 py-2 text-sm font-ui hover:bg-paper-200 transition-colors flex items-center space-x-2 ${
+                locale === language.code ? 'bg-paper-200 text-persimmon-600 font-bold' : 'text-ink-700'
               }`}
             >
               <span>{language.flag}</span>

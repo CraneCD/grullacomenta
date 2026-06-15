@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none" role="img" aria-label="Grulla Comenta origami crane">
+  
+  <g fill="currentColor">
+    
+    <path d="M41 39 L31 5 L60 19 Z" opacity="0.55"></path>
+    
+    <path d="M41 39 L31 5 L40 24 Z" opacity="0.8"></path>
+    
+    <path d="M41 39 L78 23 L62 41 Z" opacity="0.62"></path>
+    
+    <path d="M41 39 L7 28 L23 42 Z" opacity="0.9"></path>
+    
+    <path d="M9 28 L1 33 L13 33 Z" opacity="1"></path>
+    
+    <path d="M41 39 L23 42 L38 63 Z" opacity="1"></path>
+    
+    <path d="M41 39 L38 63 L53 55 Z" opacity="0.72"></path>
+  </g>
+</svg>
