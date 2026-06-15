@@ -63,7 +63,7 @@ export default function SearchPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-gray-300">{tCommon('loading')}</div>
+        <div className="text-ink-600">{tCommon('loading')}</div>
       </div>
     );
   }
@@ -71,11 +71,11 @@ export default function SearchPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-white">
+        <h1 className="font-display text-3xl font-bold text-ink-900">
           {searchQuery ? `Search results for "${searchQuery}"` : 'Search Posts'}
         </h1>
         {searchQuery && (
-          <p className="mt-2 text-gray-300">
+          <p className="mt-2 font-body text-ink-600">
             {reviews.length === 0 
               ? 'No posts found matching your search.'
               : `Found ${reviews.length} post${reviews.length !== 1 ? 's' : ''} matching your search.`
@@ -89,14 +89,14 @@ export default function SearchPage() {
       )}
 
       {searchQuery && reviews.length === 0 && !loading && (
-        <div className="text-center text-gray-400 py-8">
+        <div className="text-center text-ink-500 py-8">
           <p>No posts found for "{searchQuery}".</p>
           <p className="mt-2">Try searching with different keywords.</p>
         </div>
       )}
 
       {!searchQuery && (
-        <div className="text-center text-gray-400 py-8">
+        <div className="text-center text-ink-500 py-8">
           <p>Enter a search term to find posts.</p>
         </div>
       )}

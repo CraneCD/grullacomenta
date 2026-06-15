@@ -143,7 +143,7 @@ export default function ReviewsPage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="font-display text-4xl font-black text-ink-900 mb-4">
             {t('title')}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
@@ -160,7 +160,7 @@ export default function ReviewsPage() {
               placeholder={t('searchPlaceholder') || 'Search reviews...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-persimmon-400 focus:border-persimmon-400"
             />
           </div>
 
@@ -169,7 +169,7 @@ export default function ReviewsPage() {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-persimmon-400 focus:border-persimmon-400"
             >
               <option value="">{t('filterAll')}</option>
               {availableCategories.map(category => (
@@ -186,7 +186,7 @@ export default function ReviewsPage() {
               <select
                 value={platformFilter}
                 onChange={(e) => setPlatformFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-persimmon-400 focus:border-persimmon-400"
               >
                 <option value="">{t('platformAll')}</option>
                 {availablePlatforms.map(platform => (
@@ -227,7 +227,7 @@ export default function ReviewsPage() {
                   setCategoryFilter('');
                   setPlatformFilter('');
                 }}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="mt-4 px-5 py-2 bg-persimmon-500 text-[#FFF8F0] font-ui font-bold rounded-pill shadow-sm hover:bg-persimmon-600 transition-colors"
               >
                 {t('clearFilters')}
               </button>
