@@ -53,8 +53,7 @@ const SLUG_TO_ID = {
   'camaron-mantis': 'cmnn8729c0005cnde8333utlz',
   'angel': 'cmnn871zz0003cndew8gwtp70',
   'aliens-serpo': 'cmnn871ky0001cndevkrmkmbk',
-  // 'complejo-de-dios' and 'god-complex' handled specially below.
-  'complejo-de-dios': 'cmnn872w40009cndeoqtmc5k2',
+  // 'complejo-de-dios' and 'god-complex' handled specially below (not via part files).
 };
 
 const url = process.env.DATABASE_URL;
@@ -91,6 +90,16 @@ const gc = await client.query(
    WHERE slug = 'god-complex' AND ("contentEn" IS NULL OR btrim("contentEn") = '')`
 );
 if (gc.rowCount) console.log('updated god-complex (copied existing English)');
+
+// 'complejo-de-dios' is the Spanish version of the same essay as 'god-complex';
+// its English translation is god-complex's (English) contentEs.
+const cdd = await client.query(
+  `UPDATE "Review" SET
+     "contentEn" = (SELECT "contentEs" FROM "Review" WHERE slug = 'god-complex'),
+     "titleEn" = 'God Complex'
+   WHERE slug = 'complejo-de-dios' AND ("contentEn" IS NULL OR btrim("contentEn") = '')`
+);
+if (cdd.rowCount) console.log('updated complejo-de-dios (reused god-complex English)');
 
 console.log(`\nDone. Updated ${updated} from part files, skipped ${skipped} (no files yet).`);
 await client.end();
