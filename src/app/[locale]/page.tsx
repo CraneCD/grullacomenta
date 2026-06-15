@@ -91,10 +91,10 @@ export default function Home() {
 
           <div className="relative max-w-2xl">
             <span className="gc-kicker text-persimmon-300 block mb-5">
-              Lecturas lentas · Opiniones cuidadas
+              {t('heroKicker')}
             </span>
             <h1 className="font-display text-4xl sm:text-5xl font-black text-paper-100 leading-tight mb-4">
-              Ensayos sobre anime, manga y videojuegos
+              {t('heroTitle')}
             </h1>
             <p className="font-body text-ink-300 text-lg leading-relaxed mb-8">
               {t('subtitle')}
