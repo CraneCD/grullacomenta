@@ -2,27 +2,157 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Grulla Comenta · Design tokens ───────────────────────────────────────────
+   A warm, cozy palette of traditional Japanese pigments: washi paper, sumi ink,
+   kaki (persimmon), ai (indigo), matcha, kin (gold), azuki. Reach for the
+   semantic aliases in product code; the ramps exist so we can compose new ones.
+   ──────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Paper / washi — warm cream neutrals */
+  --paper-50: #FFFDF8;
+  --paper-100: #FBF5EB;
+  --paper-200: #F4EAD8;
+  --paper-300: #EADCC2;
+  --paper-400: #DCC9A8;
+
+  /* Sumi ink — warm browny near-blacks */
+  --ink-900: #2A2521;
+  --ink-800: #3B342D;
+  --ink-700: #4F463C;
+  --ink-600: #6B6053;
+  --ink-500: #8B7F70;
+  --ink-400: #A99C8B;
+  --ink-300: #C7BAA8;
+
+  /* Kaki / persimmon — primary accent (柿) */
+  --persimmon-200: #F7CBA8;
+  --persimmon-300: #F0A878;
+  --persimmon-400: #E5814A;
+  --persimmon-500: #D9602E;
+  --persimmon-600: #BC4A20;
+  --persimmon-700: #983819;
+
+  /* Ai / indigo — cool counterweight (藍) */
+  --indigo-300: #8395AB;
+  --indigo-400: #566982;
+  --indigo-500: #3D5169;
+  --indigo-600: #2E3E52;
+  --indigo-700: #22303F;
+
+  /* Matcha (抹茶) · Kin / gold (金) · Azuki (小豆) · Sakura (桜) */
+  --matcha-500: #7E8E4C;
+  --matcha-600: #63713A;
+  --gold-500: #C5953A;
+  --azuki-500: #B14B3E;
+  --sakura-400: #E79CA6;
+
+  /* Semantic surfaces & text */
+  --bg: var(--paper-100);
+  --bg-sunken: var(--paper-200);
+  --surface: var(--paper-50);
+  --surface-raised: #FFFFFF;
+  --surface-ink: var(--ink-900);
+  --text: var(--ink-900);
+  --text-muted: var(--ink-600);
+  --text-subtle: var(--ink-500);
+  --text-on-dark: var(--paper-100);
+  --text-on-dark-muted: var(--ink-300);
+  --text-on-primary: #FFF8F0;
+
+  /* Borders & dividers */
+  --border: #E7D9C2;
+  --border-strong: #D8C4A4;
+  --divider: #EFE4D2;
+
+  /* Brand / primary (persimmon) + accent (indigo) */
+  --primary: var(--persimmon-500);
+  --primary-hover: var(--persimmon-600);
+  --primary-press: var(--persimmon-700);
+  --primary-soft: var(--persimmon-200);
+  --primary-tint: #FBEADD;
+  --accent: var(--indigo-500);
+  --accent-hover: var(--indigo-600);
+
+  /* Genre accents — the three content pillars */
+  --genre-anime: var(--persimmon-500);
+  --genre-manga: var(--indigo-500);
+  --genre-games: var(--matcha-600);
+
+  /* Focus ring */
+  --ring: 0 0 0 3px rgba(217, 96, 46, 0.28);
+
+  /* Radii — soft & rounded is the brand */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Shadows — warm, low, diffuse (sunlight through shoji) */
+  --shadow-xs: 0 1px 2px rgba(74, 48, 24, 0.06);
+  --shadow-sm: 0 2px 6px -1px rgba(74, 48, 24, 0.09);
+  --shadow-md: 0 6px 18px -6px rgba(74, 48, 24, 0.16);
+  --shadow-lg: 0 16px 40px -12px rgba(74, 48, 24, 0.22);
+
+  /* Typography families (wired to next/font in layout.tsx) */
+  --font-display: var(--font-zen-old-mincho), Georgia, serif;
+  --font-body: var(--font-shippori-mincho), Georgia, serif;
+  --font-ui: var(--font-zen-maru-gothic), ui-rounded, system-ui, sans-serif;
+
+  /* Layout */
+  --container: 1200px;
+  --header-h: 72px;
+  --tracking-label: 0.12em;
+}
+
 @layer base {
   body {
-    @apply bg-[#121212] text-gray-100 antialiased;
+    @apply bg-paper-100 text-ink-900 font-ui antialiased;
+  }
+
+  /* Headings default to the editorial serif */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    text-wrap: balance;
   }
 
   h1 {
-    @apply text-2xl md:text-3xl font-bold text-white mb-4;
+    @apply text-3xl md:text-4xl font-bold text-ink-900 mb-4;
   }
 
   h2 {
-    @apply text-xl md:text-2xl font-bold text-white mb-3;
+    @apply text-2xl md:text-3xl font-bold text-ink-900 mb-3;
   }
 
   h3 {
-    @apply text-lg md:text-xl font-semibold text-white mb-2;
+    @apply text-xl md:text-2xl font-semibold text-ink-900 mb-2;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--primary-soft);
+    color: var(--ink-900);
   }
 }
 
 @layer components {
   .container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Eyebrow / kicker label — recurring brand device */
+  .gc-kicker {
+    @apply font-ui font-bold text-xs uppercase text-persimmon-500;
+    letter-spacing: var(--tracking-label);
+  }
+
+  /* Long-form reading column — the book serif, set large and airy */
+  .gc-prose {
+    font-family: var(--font-body);
+    @apply text-lg leading-[1.75] text-ink-800;
   }
 
   .icon {
@@ -33,59 +163,49 @@
     @apply w-6 h-6;
   }
 
+  /* Pill buttons — rounded is the brand */
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-pill font-ui font-bold transition-all;
   }
 
   .btn-primary {
-    @apply bg-blue-500 text-white hover:bg-blue-600;
+    @apply bg-persimmon-500 text-[#FFF8F0] shadow-sm hover:bg-persimmon-600 hover:shadow-md active:translate-y-px;
   }
 
   .btn-secondary {
-    @apply bg-gray-700 text-white hover:bg-gray-600;
+    @apply bg-paper-50 text-ink-800 border-2 border-border-strong hover:bg-paper-100 hover:border-ink-400;
   }
 
+  /* Cards — rounded surface, warm hairline border, soft shadow */
   .card {
-    @apply bg-[#1a1a1a] rounded-lg overflow-hidden border border-gray-800 transition-all hover:border-gray-700;
+    @apply bg-paper-50 rounded-lg overflow-hidden border border-border shadow-sm transition-all;
+  }
+
+  .card-interactive {
+    @apply hover:-translate-y-0.5 hover:shadow-md;
   }
 
   .card-body {
-    @apply p-4;
+    @apply p-5;
   }
 
   .review-grid {
     @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
   }
 
-  .review-score {
-    @apply text-3xl font-bold text-blue-500;
-  }
-
   .nav-link {
-    @apply text-gray-300 hover:text-white transition-colors;
+    @apply text-ink-600 hover:text-persimmon-500 transition-colors;
   }
 
   .nav-link-active {
-    @apply text-white font-medium;
+    @apply text-persimmon-500 font-medium;
   }
 
   .form-input {
-    @apply w-full px-4 py-2 bg-[#2d2d2d] border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500;
+    @apply w-full px-4 py-2 bg-paper-50 border border-border-strong rounded-pill text-ink-900 placeholder-ink-500 focus:outline-none focus:border-persimmon-400;
   }
 
-  .table-container {
-    @apply w-full overflow-x-auto;
-  }
-
-  .table {
-    @apply min-w-full divide-y divide-gray-800;
-  }
-
-  .table th {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider;
-  }
-
-  .table td {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-300;
+  .form-input:focus-visible {
+    box-shadow: var(--ring);
   }
 }
