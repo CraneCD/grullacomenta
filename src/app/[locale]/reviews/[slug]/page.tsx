@@ -170,7 +170,7 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
             </div>
           </div>
 
-          <div className="gc-prose max-w-prose">
+          <div className="gc-prose w-full">
             {getLocalizedContent(review, locale).split('\n').map((paragraph, index) => (
               paragraph.trim() && (
                 <p key={index} className="mb-6">
