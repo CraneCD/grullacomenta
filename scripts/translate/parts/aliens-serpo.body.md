@@ -1,0 +1,33 @@
+Of the two types of threats presented in the world of Dandadan, it is sometimes hard to decide which of the two is worse. On one hand we have the Yokai, who do not hesitate for an instant to finish you off or possess you if you interfere with their territory or if they take a particular interest in you as a person; but on the other hand, we have what in my opinion is the more dangerous of the two, the aliens, who actively seek to abduct, mutilate, and steal the banana organs of humans with high spiritual energy. Of course, the example we know best of these invasive creatures is the Serpo Aliens, our topic for today.
+
+This alien race is rather strange. The main thing is that they are all men, and the second is that they appear to be completely homogeneous, to the point that they seem to share a single, general consciousness, all of them seeing humans the same way: as a salaryman with the most creepy head and proportions of all time, and with psychic abilities that they can amplify the more of them that are gathered together.
+
+Because their race is exclusively male, the Serpo have no way to reproduce naturally and resort to using cloning technology. However, since biological evolution cannot occur among identical beings, the Serpo found this solution to be ineffective and seek to obtain reproductive organs by abducting humans from Earth and stealing their reproductive organs (also known as "bananas").
+
+The Serpo are usually seen wearing humanoid disguises with gray skin and a masculine appearance. These disguises share a common outfit consisting of white collared button-up shirts tucked into gray dress pants, leather belts, and brown shoes. The heads of the disguises are notable for their thin lips, which are drawn into incredibly wide and disturbing smiles.
+
+Outside of their disguises, the Serpo have angular, slug-like heads with prominent lips and broad teeth. Their bodies are wide and sharply angled at the shoulders and torso. Black markings cover most of their bodies. They have two fingers and two thumbs on each hand, and their feet are cleft at the tips. The Serpo also possess a pair of crystalline, headlight-like eyes, whose color varies between individuals, such as pink, yellow, cyan, red, green, or purple, this being the only difference between them.
+
+The Serpo are aggressive and violent toward humans when abducting them, but, beyond that, they are oblivious to this reality, believing their actions to be peaceful. They also prefer to abduct human women rather than human men and have stated that they detest encountering humans who behave in a barbaric manner (that is, those who resist). Another of their interests is the supernatural abilities of humans who have obtained powers from spirits, since those powers often surpass the capabilities of the Serpo's already highly advanced technologies.
+
+In addition to their unconscious hostility toward humans, the Serpo are brusque and cold with their subordinates, caring nothing for the well-being of the employees they hire, whom they see as cheap and easily replaceable. While the Dover Demon took on the task of fighting Momo, Okarun, and Aira, the Serpo tried to motivate it during its poor performance by deducting its salary and injecting it with a mutagenic fluid intended to increase its speed and strength (despite its objections).
+
+As manufactured clones, the Serpo have artificial bodies that are predominantly mechanical but partially organic, as demonstrated by their ability to bleed. They are capable of surviving severe bodily damage, including the loss of limbs and even the entire lower half of their body.
+
+The Serpo's mechanical bodies are equipped with various tools that are stored in their lower region and abdomen, such as, for example, their reproductive organ: a mechanical appendage with a retractable needle used for the purpose of extracting banana organs from human women by means of, you can imagine what. The cable can also be used to increase an alien's power, injecting it with an enhancer.
+
+Additionally, they have other tools, such as giant scissors, or cables to carry out their fusion.
+
+The Serpo are incredibly intelligent and possess advanced skills in science and technology. With their advanced technology, they are capable of creating clones of themselves, building tools inside their bodies, manufacturing UFOs, and developing the devices necessary to project the Void Space.
+
+Of course, the Serpo possess psychic powers that allow them to manipulate objects and people, generate shock waves, create psychic fields, and manipulate brain waves. They use this last ability to induce a state of physical arousal in abducted humans while they prepare to extract their reproductive organs.
+
+In terms of their techniques, the main one is the Six Senses Organ, with which, by extending their hand forward, the Serpo can emit shock waves strong enough to create craters in walls and attack their target.
+
+In addition, they have an evolution of this technique called the Serpoian Form Serpo-Grammetry. After making the fingers of their left hand point toward the palm of their right hand to form the letter T, the Serpo emits a stronger variant of the Six Senses Organ, which Aira describes as being struck by an "invisible wall."
+
+Lastly, they have an ability called the Amazing Zone, which requires multiple aliens working together. By combining their psychokinetic powers, the Serpo are able to create a pressurized field that can nullify and subdue a human with yokai powers. This appears to be their main ability to defend themselves against the powers of a Yokai, which indicates their knowledge of and preparation against these beings on Earth.
+
+As you can see, we know quite a lot about these strange creatures who act as the main antagonists during the first arcs of the story, and although their motivations are quite basic, their existence in the context of Dandadan, and their ridiculous but funny forms and powers, are a perfect complement to the more chilling Yokai we see in the series. In fact, it is thanks to the Serpo that the story exists, as they are the ones who initially awaken Momo's powers, so we have much to thank these chilling intergalactic creatures for.
+
+The creation of a Serpo that is identical in appearance and behaves similarly to the others requires the input of a specific set of data. In the event that its data is overwritten at the moment of its birth, a Serpo will take on a different form called This Man (ディス マン Disu Man?). This form resembles a semi-bald man with large eyebrows, wearing a zip-up hoodie and loose sweatpants. The execution of his psychokinesis is also altered; instead of extending his hand forward or forming the letter T, he claps his hands.
