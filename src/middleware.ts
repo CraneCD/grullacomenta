@@ -14,10 +14,12 @@ const intlMiddleware = createIntlMiddleware({
   localePrefix: 'always'
 });
 
-// Create a new ratelimiter that allows 10 requests per 10 seconds
+// Create a new ratelimiter that allows 50 requests per 10 seconds.
+// The window is generous because Next.js prefetches every visible <Link>
+// href, so a single page load can fire many requests against one IP.
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, '10 s'),
+  limiter: Ratelimit.slidingWindow(50, '10 s'),
   analytics: true,
   prefix: '@upstash/ratelimit',
 });
@@ -97,6 +99,18 @@ export default async function middleware(req: NextRequestWithAuth) {
   // Next.js prefetches all visible <Link> hrefs simultaneously, which would
   // trivially exhaust a per-IP limit on page navigation.
   if (isAuth) {
+    return intlResponse || NextResponse.next();
+  }
+
+  // Skip rate limiting for Next.js prefetch requests. These are fired in the
+  // background for every visible <Link> and would otherwise count against the
+  // per-IP limit even though the user never actively navigated.
+  const isPrefetch =
+    req.headers.get('Next-Router-Prefetch') === '1' ||
+    req.headers.get('purpose') === 'prefetch' ||
+    req.headers.get('x-purpose') === 'prefetch';
+
+  if (isPrefetch) {
     return intlResponse || NextResponse.next();
   }
 
