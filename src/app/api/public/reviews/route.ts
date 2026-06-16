@@ -74,9 +74,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(transformedReviews);
   } catch (error) {
-    console.error('Error fetching public reviews:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Error fetching public reviews:', message);
     return NextResponse.json(
-      { error: 'Failed to fetch reviews' },
+      { error: 'Failed to fetch reviews', detail: message },
       { status: 500 }
     );
   }
