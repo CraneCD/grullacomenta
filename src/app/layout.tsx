@@ -33,9 +33,9 @@ export const metadata: Metadata = {
   title: "Grulla Comenta - Anime, Manga y Videojuegos",
   description: "Grulla Comenta es un lugar para guardar y exponer ensayos sobre anime, manga y videojuegos. Lecturas lentas, opiniones cuidadas.",
   icons: {
-    icon: '/minilogo.png',
-    shortcut: '/minilogo.png',
-    apple: '/minilogo.png',
+    icon: '/logo-grulla-badge.png',
+    shortcut: '/logo-grulla-badge.png',
+    apple: '/logo-grulla-badge.png',
   },
 };
 

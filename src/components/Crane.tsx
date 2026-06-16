@@ -7,17 +7,33 @@
 function CranePaths() {
   return (
     <>
-      <path d="M41 39 L31 5 L60 19 Z" opacity="0.55" />
-      <path d="M41 39 L31 5 L40 24 Z" opacity="0.8" />
-      <path d="M41 39 L78 23 L62 41 Z" opacity="0.62" />
-      <path d="M41 39 L7 28 L23 42 Z" opacity="0.9" />
-      <path d="M9 28 L1 33 L13 33 Z" />
-      <path d="M41 39 L23 42 L38 63 Z" />
-      <path d="M41 39 L38 63 L53 55 Z" opacity="0.72" />
+      {/* Neck & head */}
+      <path d="M4,39 L13,31 L9,42 Z" opacity="0.88" />
+      <path d="M13,31 L45,52 L9,42 Z" opacity="0.50" />
+      <path d="M9,42 L45,52 L42,58 Z" opacity="0.70" />
+      {/* Front wing */}
+      <path d="M45,52 L50,3 L58,56 Z" opacity="0.42" />
+      <path d="M50,3 L61,27 L58,56 Z" opacity="0.60" />
+      {/* Back wing */}
+      <path d="M61,27 L80,13 L58,56 Z" opacity="0.50" />
+      <path d="M80,13 L86,55 L58,56 Z" opacity="0.36" />
+      {/* Body */}
+      <path d="M45,52 L58,56 L42,58 Z" opacity="0.58" />
+      <path d="M42,58 L58,56 L41,85 Z" opacity="0.64" />
+      <path d="M41,85 L58,56 L62,87 Z" opacity="0.82" />
+      <path d="M58,56 L86,55 L62,87 Z" opacity="0.56" />
+      <path d="M86,55 L89,63 L62,87 Z" opacity="0.66" />
+      {/* Tail */}
+      <path d="M86,55 L117,36 L89,63 Z" opacity="0.40" />
     </>
   );
 }
 
+/**
+ * CraneMark — the faceted origami crane (orizuru) drawn with currentColor so it
+ * recolors cleanly. It is the rating glyph and a faint watermark on cover art.
+ * The crane's natural aspect ratio is 120×90 (4:3); width is derived from height.
+ */
 export function CraneMark({
   size = 28,
   className = '',
@@ -27,15 +43,51 @@ export function CraneMark({
 }) {
   return (
     <svg
-      viewBox="0 0 80 80"
+      viewBox="0 0 120 90"
       fill="currentColor"
-      width={size}
+      width={Math.round((size * 120) / 90)}
       height={size}
       className={className}
       aria-hidden="true"
     >
       <CranePaths />
     </svg>
+  );
+}
+
+/**
+ * BrandBadge — the primary brand logomark: the straw-hatted grulla mascot in a
+ * round badge. Use `ring` for a hairline ring on busy or dark surfaces.
+ */
+export function BrandBadge({
+  size = 30,
+  ring = false,
+  className = '',
+}: {
+  size?: number;
+  ring?: boolean;
+  className?: string;
+}) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/logo-grulla-badge.png"
+      alt="Grulla Comenta"
+      width={size}
+      height={size}
+      className={className}
+      style={{
+        width: size,
+        height: size,
+        display: 'block',
+        borderRadius: '50%',
+        objectFit: 'cover',
+        flex: 'none',
+        boxShadow: ring
+          ? '0 0 0 2px color-mix(in srgb, var(--paper-50, #fff) 70%, transparent)'
+          : undefined,
+      }}
+    />
   );
 }
 
