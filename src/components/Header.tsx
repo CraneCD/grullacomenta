@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { CraneMark } from './Crane';
+import { BrandBadge } from './Crane';
 import LanguageSwitcher from './LanguageSwitcher';
 
 interface CategoryData {
@@ -97,7 +97,7 @@ export default function Header() {
             href={`/${locale}`}
             className="flex items-center gap-2.5 hover:opacity-90 transition-opacity"
           >
-            <CraneMark size={30} className="text-persimmon-500" />
+            <BrandBadge size={36} />
             <span className="font-display font-black text-xl sm:text-2xl text-ink-900 tracking-tight">
               Grulla Comenta
             </span>
