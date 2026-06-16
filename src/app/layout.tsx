@@ -32,11 +32,6 @@ const zenMaruGothic = Zen_Maru_Gothic({
 export const metadata: Metadata = {
   title: "Grulla Comenta - Anime, Manga y Videojuegos",
   description: "Grulla Comenta es un lugar para guardar y exponer ensayos sobre anime, manga y videojuegos. Lecturas lentas, opiniones cuidadas.",
-  icons: {
-    icon: '/logo-grulla-badge.png',
-    shortcut: '/logo-grulla-badge.png',
-    apple: '/logo-grulla-badge.png',
-  },
 };
 
 export default function RootLayout({
