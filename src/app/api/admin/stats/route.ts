@@ -49,7 +49,7 @@ export async function GET() {
       totalReviews,
       animeAndMangaReviews: animeCount + mangaCount,
       videoGameReviews: videoGamesCount,
-      recentActivity: recentReviews.map(review => ({
+      recentActivity: recentReviews.map((review: { id: string; title: string; author: { name: string | null }; updatedAt: Date; status: string }) => ({
         id: review.id,
         title: review.title,
         action: 'Updated',
