@@ -26,9 +26,9 @@ export async function GET() {
     });
 
     // Calculate category-specific counts
-    const animeCount = categoryStats.find(stat => stat.category === 'anime')?._count.category || 0;
-    const mangaCount = categoryStats.find(stat => stat.category === 'manga')?._count.category || 0;
-    const videoGamesCount = categoryStats.find(stat => stat.category === 'video-games')?._count.category || 0;
+    const animeCount = categoryStats.find((stat: { category: string; _count: { category: number } }) => stat.category === 'anime')?._count.category || 0;
+    const mangaCount = categoryStats.find((stat: { category: string; _count: { category: number } }) => stat.category === 'manga')?._count.category || 0;
+    const videoGamesCount = categoryStats.find((stat: { category: string; _count: { category: number } }) => stat.category === 'video-games')?._count.category || 0;
 
     // Get recent reviews for activity feed
     const recentReviews = await prisma.review.findMany({
