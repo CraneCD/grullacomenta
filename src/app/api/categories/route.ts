@@ -18,7 +18,7 @@ export async function GET() {
     const categories = new Set<string>();
     const platforms = new Map<string, Set<string>>();
 
-    reviews.forEach(review => {
+    reviews.forEach((review: { category: string | null; platform: string | null }) => {
       if (review.category) {
         categories.add(review.category);
         

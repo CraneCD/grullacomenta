@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       ...(take !== undefined ? { take } : {}),
     });
 
-    const transformedReviews = reviews.map((review) => ({
+    const transformedReviews = reviews.map((review: (typeof reviews)[number]) => ({
       id: review.id,
       title: review.title,
       titleEs: review.titleEs,
