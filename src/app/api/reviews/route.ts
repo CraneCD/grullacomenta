@@ -28,7 +28,22 @@ export async function GET(request: NextRequest) {
     logger.info('Fetching all reviews');
 
     const reviews = await prisma.review.findMany({
-      include: {
+      select: {
+        id: true,
+        title: true,
+        titleEs: true,
+        titleEn: true,
+        slug: true,
+        category: true,
+        platform: true,
+        coverImage: true,
+        imageMimeType: true,
+        youtubeUrl: true,
+        rating: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        authorId: true,
         author: {
           select: {
             name: true,
@@ -39,8 +54,22 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
+    const hasContentFlags = await prisma.$queryRaw`
+      SELECT id, ("contentEs" IS NOT NULL AND "contentEs" != '') AS "hasContentEs",
+             ("contentEn" IS NOT NULL AND "contentEn" != '') AS "hasContentEn"
+      FROM "Review"
+    ` as { id: string; hasContentEs: boolean; hasContentEn: boolean }[];
+
+    const flagsById = new Map(hasContentFlags.map((f) => [f.id, f]));
+
+    const reviewsWithFlags = reviews.map((review: (typeof reviews)[number]) => ({
+      ...review,
+      contentEs: flagsById.get(review.id)?.hasContentEs ? 'present' : null,
+      contentEn: flagsById.get(review.id)?.hasContentEn ? 'present' : null,
+    }));
+
     logger.info(`Retrieved ${reviews.length} reviews`);
-    return NextResponse.json(reviews);
+    return NextResponse.json(reviewsWithFlags);
   } catch (error) {
     logger.error('Error fetching reviews', error as Error);
     return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 });
