@@ -61,8 +61,8 @@ export default function Home() {
     const fetchReviews = async () => {
       try {
         const [animeRes, mangaRes] = await Promise.all([
-          fetch('/api/public/reviews?category=anime&limit=10'),
-          fetch('/api/public/reviews?category=manga&limit=10'),
+          fetch('/api/public/reviews?category=anime&limit=12'),
+          fetch('/api/public/reviews?category=manga&limit=12'),
         ]);
         setAnimeReviews(animeRes.ok ? await animeRes.json() : []);
         setMangaReviews(mangaRes.ok ? await mangaRes.json() : []);
