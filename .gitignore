@@ -47,3 +47,7 @@ logs/
 *.log
 
 /src/generated/prisma
+
+# local sqlite databases (never commit; may contain real or dev credentials)
+*.db
+*.db-journal
