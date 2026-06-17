@@ -163,10 +163,10 @@ export default function Home() {
           {/* ── Content ── */}
           <div className="relative mx-auto max-w-2xl text-center">
             <span className="gc-kicker text-persimmon-300 block mb-5">
-              Lecturas lentas · Opiniones cuidadas
+              {t('heroKicker')}
             </span>
             <h1 className="font-display text-4xl sm:text-5xl font-black text-paper-100 leading-tight mb-4 [text-shadow:0_2px_24px_rgba(0,0,0,0.35)]">
-              Ensayos sobre anime, manga y videojuegos
+              {t('heroTitle')}
             </h1>
             <p className="font-body text-ink-300 text-lg leading-relaxed mb-8 max-w-xl mx-auto">
               {t('subtitle')}
