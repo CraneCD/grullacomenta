@@ -134,20 +134,12 @@ export default async function middleware(req: NextRequestWithAuth) {
     });
   }
 
-  // Add security headers
-  const headers = req.headers;
-  headers.set('X-DNS-Prefetch-Control', 'on');
-  headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-  headers.set('X-XSS-Protection', '1; mode=block');
-  headers.set('X-Frame-Options', 'SAMEORIGIN');
-  headers.set('X-Content-Type-Options', 'nosniff');
-  headers.set('Referrer-Policy', 'origin-when-cross-origin');
-  headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'"
-  );
+  // Security headers (CSP, HSTS, X-Frame-Options, etc.) are applied to every
+  // route — including /api/* — by the headers() config in next.config.js,
+  // which runs at the framework level rather than here.
 
-  // Verify CSRF token for non-GET requests (but not for API routes)
+  // Require an authenticated session for non-GET requests to non-API pages
+  // (API routes enforce their own CSRF token check via lib/csrf.ts).
   if (req.method !== 'GET' && !pathname.startsWith('/api/')) {
     if (!token) {
       return new NextResponse('Unauthorized', { status: 401 });

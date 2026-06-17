@@ -24,9 +24,18 @@ const LOG_DIR = path.join(process.cwd(), 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'app.log');
 const ERROR_LOG_FILE = path.join(LOG_DIR, 'error.log');
 
-// Ensure log directory exists
-if (!fs.existsSync(LOG_DIR)) {
-  fs.mkdirSync(LOG_DIR, { recursive: true });
+// Most serverless hosts (e.g. Vercel) ship a read-only filesystem outside
+// /tmp, so file logging is only attempted in environments where it works;
+// elsewhere we silently fall back to console output (still captured by the
+// platform's log collector).
+let canWriteLogFiles = false;
+try {
+  if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+  }
+  canWriteLogFiles = true;
+} catch {
+  canWriteLogFiles = false;
 }
 
 // Format log entry
@@ -46,16 +55,19 @@ function formatLogEntry(entry: LogEntry): string {
   return logLine + '\n';
 }
 
-// Write log to file
+// Write log to file (when possible) and always to console
 function writeLog(entry: LogEntry, file: string): void {
   const logLine = formatLogEntry(entry);
-  
-  fs.appendFileSync(file, logLine);
-  
-  // Also log to console in development
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(logLine);
+
+  if (canWriteLogFiles) {
+    try {
+      fs.appendFileSync(file, logLine);
+    } catch {
+      canWriteLogFiles = false;
+    }
   }
+
+  console.log(logLine);
 }
 
 // Logger class

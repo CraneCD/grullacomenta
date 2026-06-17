@@ -6,26 +6,12 @@ import { z } from 'zod';
 import { csrfMiddleware } from '@/lib/csrf';
 import { rateLimitMiddleware } from '@/lib/rateLimit';
 import { prisma } from '@/lib/prisma';
-
-const logger = {
-  info: (message: string, context?: unknown) => {
-    console.log(`[INFO] ${message}`, context ? JSON.stringify(context) : '');
-  },
-  warn: (message: string, context?: unknown) => {
-    console.warn(`[WARN] ${message}`, context ? JSON.stringify(context) : '');
-  },
-  error: (message: string, error?: Error, context?: unknown) => {
-    console.error(`[ERROR] ${message}`, error?.message || '', context ? JSON.stringify(context) : '');
-    if (error?.stack) {
-      console.error('Stack trace:', error.stack);
-    }
-  }
-};
+import { logger } from '@/lib/logger';
 
 // GET all reviews — requires authentication (admin panel use)
 export async function GET(request: NextRequest) {
   try {
-    const rateLimitResult = rateLimitMiddleware(request);
+    const rateLimitResult = await rateLimitMiddleware(request);
     if (rateLimitResult) {
       logger.warn('Rate limit exceeded', { ip: request.ip, path: request.nextUrl.pathname });
       return rateLimitResult;
@@ -34,6 +20,9 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     logger.info('Fetching all reviews');
@@ -65,7 +54,7 @@ export async function POST(request: NextRequest) {
   try {
     logger.info('POST /api/reviews - Starting request processing');
 
-    const rateLimitResult = rateLimitMiddleware(request);
+    const rateLimitResult = await rateLimitMiddleware(request);
     if (rateLimitResult) {
       logger.warn('Rate limit exceeded', { ip: request.ip, path: request.nextUrl.pathname });
       return rateLimitResult;
@@ -83,6 +72,10 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.email) {
       logger.warn('Unauthorized review creation attempt', { ip: request.ip, path: request.nextUrl.pathname });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (session.user.role !== 'admin') {
+      logger.warn('Forbidden review creation attempt', { email: session.user.email, ip: request.ip });
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const body = await request.json();
@@ -113,19 +106,20 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
 
-    const existingSlugs = await prisma.$queryRaw`
-      SELECT slug FROM "Review" WHERE slug LIKE ${slug + '%'}
-    ` as { slug: string }[];
+    const existingSlugs = await prisma.review.findMany({
+      where: { slug: { startsWith: slug } },
+      select: { slug: true },
+    });
 
     if (existingSlugs.length > 0) {
       const slugNumbers = existingSlugs
-        .map((s) => s.slug)
-        .filter((s) => s.startsWith(slug))
-        .map((s) => {
+        .map((s: { slug: string }) => s.slug)
+        .filter((s: string) => s.startsWith(slug))
+        .map((s: string) => {
           const match = s.match(new RegExp(`^${slug}(?:-(\\d+))?$`));
           return match ? (match[1] ? parseInt(match[1]) : 0) : -1;
         })
-        .filter((n) => n >= 0);
+        .filter((n: number) => n >= 0);
 
       const maxNumber = slugNumbers.length > 0 ? Math.max(...slugNumbers) : -1;
       if (maxNumber >= 0) {

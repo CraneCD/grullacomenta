@@ -215,10 +215,7 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
       }
       
       const { token: csrfToken } = await csrfResponse.json();
-      console.log('CSRF Token obtained:', csrfToken ? 'Yes' : 'No');
-      
-      // Use absolute path to avoid locale prefix
-      console.log('Sending upload request to /api/upload');
+
       const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
@@ -228,13 +225,9 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
         body: formData,
       });
 
-      console.log('Upload response status:', response.status);
-      console.log('Upload response headers:', Object.fromEntries(response.headers.entries()));
-
       // Check if the response is JSON
       const contentType = response.headers.get('content-type');
-      console.log('Response content type:', contentType);
-      
+
       if (!contentType || !contentType.includes('application/json')) {
         const errorText = await response.text();
         console.error('Non-JSON response:', errorText);
@@ -243,13 +236,11 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Upload error response:', errorData);
         throw new Error(errorData.error || errorData.details || `Failed to upload image (${response.status})`);
       }
 
       const result = await response.json();
-      console.log('Upload successful:', result);
-      
+
       setFormData(prev => ({
         ...prev,
         imageData: result.imageData,

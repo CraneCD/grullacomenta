@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+// Images are only ever produced by our own upload pipeline (lib/imageUtils.ts),
+// which always re-encodes to WebP. Reject anything else so a review payload
+// can't smuggle in a different content type for /api/images/[id] to serve.
+const ALLOWED_IMAGE_MIME_TYPES = ['image/webp'] as const;
+const BASE64_RE = /^[A-Za-z0-9+/]+={0,2}$/;
+
 // Coerce empty strings to undefined for optional text fields.
 // The form sends '' for unfilled optional inputs; Zod's .optional() only
 // accepts undefined, so '' would otherwise fail min-length checks.
@@ -35,8 +41,14 @@ export const reviewSchema = z.object({
     message: "Rating must be between 0 and 10"
   }).optional(),
   coverImage: optionalUrl,
-  imageData: z.string().optional().nullable(),
-  imageMimeType: z.string().optional().nullable(),
+  imageData: z.preprocess(
+    (val) => (val === '' ? null : val),
+    z.string().regex(BASE64_RE, { message: 'imageData must be valid base64' }).optional().nullable()
+  ),
+  imageMimeType: z.preprocess(
+    (val) => (val === '' ? null : val),
+    z.enum(ALLOWED_IMAGE_MIME_TYPES).optional().nullable()
+  ),
   youtubeUrl: z.preprocess(
     (val) => (val === '' ? null : val),
     z.string().url().optional().nullable().refine((val) => {

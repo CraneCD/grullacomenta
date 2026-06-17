@@ -20,14 +20,6 @@ const envSchema = z.object({
   // Upstash Redis
   UPSTASH_REDIS_REST_URL: z.string().url(),
   UPSTASH_REDIS_REST_TOKEN: z.string(),
-  
-  // GitHub
-  GITHUB_ID: z.string(),
-  GITHUB_SECRET: z.string(),
-  
-  // Google
-  GOOGLE_ID: z.string(),
-  GOOGLE_SECRET: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;

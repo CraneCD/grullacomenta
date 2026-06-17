@@ -8,26 +8,29 @@ import { csrfMiddleware } from '@/lib/csrf';
 export async function POST(request: NextRequest) {
   try {
     // Apply rate limiting
-    const rateLimitResult = rateLimitMiddleware(request);
+    const rateLimitResult = await rateLimitMiddleware(request);
     if (rateLimitResult) {
-      console.log('Rate limit exceeded');
       return rateLimitResult;
     }
-    
+
     // Check CSRF protection
     const csrfResult = await csrfMiddleware(request);
     if (csrfResult) {
-      console.log('CSRF validation failed');
       return csrfResult;
     }
-    
+
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
-      console.log('Unauthorized: No valid session found');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+    if (session.user.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
       );
     }
 
@@ -40,11 +43,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('Starting image upload process...');
     // Handle image upload with our utility
-    const result = await handleImageUpload(request);
-    console.log('Image upload completed successfully');
-    return result;
+    return await handleImageUpload(request);
   } catch (error) {
     console.error('Detailed error in upload endpoint:', {
       error: error instanceof Error ? error.message : 'Unknown error',
