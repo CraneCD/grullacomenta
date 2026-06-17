@@ -126,115 +126,107 @@ export default function ReviewsPage() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-center items-center h-64">
-            <div className="text-xl text-gray-600 dark:text-gray-300">
-              {t('loadingReviews')}
-            </div>
-          </div>
-        </div>
+      <div className="flex justify-center items-center h-64">
+        <div className="text-ink-600">{t('loadingReviews')}</div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-display text-4xl font-black text-ink-900 mb-4">
-            {t('title')}
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            {t('description')}
-          </p>
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="font-display text-3xl font-bold text-ink-900">
+          {t('title')}
+        </h1>
+        <p className="mt-2 font-body text-ink-600">
+          {t('description')}
+        </p>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="space-y-4 lg:space-y-0 lg:flex lg:gap-4 lg:items-center">
+        {/* Search Input */}
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder={t('searchPlaceholder') || 'Search reviews...'}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="form-input"
+          />
         </div>
 
-        {/* Search and Filters */}
-        <div className="mb-8 space-y-4 lg:space-y-0 lg:flex lg:gap-4 lg:items-center">
-          {/* Search Input */}
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder={t('searchPlaceholder') || 'Search reviews...'}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-persimmon-400 focus:border-persimmon-400"
-            />
-          </div>
+        {/* Category Filter */}
+        <div className="lg:w-48">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="form-input"
+          >
+            <option value="">{t('filterAll')}</option>
+            {availableCategories.map(category => (
+              <option key={category} value={category}>
+                {formatCategoryName(category)}
+              </option>
+            ))}
+          </select>
+        </div>
 
-          {/* Category Filter */}
+        {/* Platform Filter */}
+        {availablePlatforms.length > 0 && (
           <div className="lg:w-48">
             <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-persimmon-400 focus:border-persimmon-400"
+              value={platformFilter}
+              onChange={(e) => setPlatformFilter(e.target.value)}
+              className="form-input"
             >
-              <option value="">{t('filterAll')}</option>
-              {availableCategories.map(category => (
-                <option key={category} value={category}>
-                  {formatCategoryName(category)}
+              <option value="">{t('platformAll')}</option>
+              {availablePlatforms.map(platform => (
+                <option key={platform} value={platform}>
+                  {formatPlatformName(platform)}
                 </option>
               ))}
             </select>
           </div>
-
-          {/* Platform Filter */}
-          {availablePlatforms.length > 0 && (
-            <div className="lg:w-48">
-              <select
-                value={platformFilter}
-                onChange={(e) => setPlatformFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-persimmon-400 focus:border-persimmon-400"
-              >
-                <option value="">{t('platformAll')}</option>
-                {availablePlatforms.map(platform => (
-                  <option key={platform} value={platform}>
-                    {formatPlatformName(platform)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
-
-        {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {filteredReviews.length === 1 
-              ? `1 ${t('title').toLowerCase().slice(0, -1)}` 
-              : `${filteredReviews.length} ${t('title').toLowerCase()}`}
-            {searchTerm && ` ${t('resultsFor') || 'for'} "${searchTerm}"`}
-          </p>
-        </div>
-
-        {/* Reviews Grid */}
-        {filteredReviews.length > 0 ? (
-          <ReviewGrid reviews={filteredReviews} showCategory={true} />
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-gray-500 dark:text-gray-400">
-              {searchTerm || categoryFilter || platformFilter 
-                ? t('noResults') || 'No reviews found matching your criteria'
-                : t('noReviewsGeneral') || 'No reviews available yet'
-              }
-            </div>
-            {(searchTerm || categoryFilter || platformFilter) && (
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setCategoryFilter('');
-                  setPlatformFilter('');
-                }}
-                className="mt-4 px-5 py-2 bg-persimmon-500 text-[#FFF8F0] font-ui font-bold rounded-pill shadow-sm hover:bg-persimmon-600 transition-colors"
-              >
-                {t('clearFilters')}
-              </button>
-            )}
-          </div>
         )}
       </div>
+
+      {/* Results Count */}
+      <div>
+        <p className="text-sm text-ink-500">
+          {filteredReviews.length === 1
+            ? `1 ${t('title').toLowerCase().slice(0, -1)}`
+            : `${filteredReviews.length} ${t('title').toLowerCase()}`}
+          {searchTerm && ` ${t('resultsFor') || 'for'} "${searchTerm}"`}
+        </p>
+      </div>
+
+      {/* Reviews Grid */}
+      {filteredReviews.length > 0 ? (
+        <ReviewGrid reviews={filteredReviews} showCategory={true} />
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-ink-500">
+            {searchTerm || categoryFilter || platformFilter
+              ? t('noResults') || 'No reviews found matching your criteria'
+              : t('noReviewsGeneral') || 'No reviews available yet'
+            }
+          </div>
+          {(searchTerm || categoryFilter || platformFilter) && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setCategoryFilter('');
+                setPlatformFilter('');
+              }}
+              className="mt-4 px-5 py-2 bg-persimmon-500 text-[#FFF8F0] font-ui font-bold rounded-pill shadow-sm hover:bg-persimmon-600 transition-colors"
+            >
+              {t('clearFilters')}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 } 
