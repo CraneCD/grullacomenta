@@ -82,43 +82,28 @@ export async function processImage(file: File): Promise<{
 // Handle image upload
 export async function handleImageUpload(request: NextRequest): Promise<NextResponse> {
   try {
-    console.log('Starting image upload process...');
     const formData = await request.formData();
     const file = formData.get('image') as File;
-    
+
     if (!file) {
-      console.log('No file provided in form data');
       return NextResponse.json(
         { error: 'No file provided' },
         { status: 400 }
       );
     }
-    
-    console.log('File received:', {
-      name: file.name,
-      type: file.type,
-      size: file.size
-    });
-    
+
     // Validate image
     const validation = await validateImage(file);
     if (!validation.valid) {
-      console.log('Image validation failed:', validation.error);
       return NextResponse.json(
         { error: validation.error },
         { status: 400 }
       );
     }
-    
-    console.log('Image validation passed, starting processing...');
+
     // Process image
     const processedImage = await processImage(file);
-    console.log('Image processing completed:', {
-      width: processedImage.width,
-      height: processedImage.height,
-      size: processedImage.data.length
-    });
-    
+
     // Convert to base64 for storage
     const base64Data = processedImage.data.toString('base64');
     

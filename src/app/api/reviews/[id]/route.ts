@@ -3,24 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/authOptions';
 import { reviewSchema, validateInput } from '@/lib/validation';
 import { z } from 'zod';
+import { csrfMiddleware } from '@/lib/csrf';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
-const logger = {
-  info: (message: string, context?: unknown) => {
-    console.log(`[INFO] ${message}`, context ? JSON.stringify(context) : '');
-  },
-  warn: (message: string, context?: unknown) => {
-    console.warn(`[WARN] ${message}`, context ? JSON.stringify(context) : '');
-  },
-  error: (message: string, error?: Error, context?: unknown) => {
-    console.error(`[ERROR] ${message}`, error?.message || '', context ? JSON.stringify(context) : '');
-    if (error?.stack) {
-      console.error('Stack trace:', error.stack);
-    }
-  }
-};
-
-// GET single review by ID
+// GET single review by ID — public for published reviews (used by the review
+// detail page); drafts/archived reviews require an admin session (used by the
+// admin edit form). Author email is never returned, it isn't used by either caller.
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -30,13 +19,20 @@ export async function GET(
       where: { id: params.id },
       include: {
         author: {
-          select: { name: true, email: true },
+          select: { name: true },
         },
       },
     });
 
     if (!review) {
       return NextResponse.json({ error: 'Review not found' }, { status: 404 });
+    }
+
+    if (review.status !== 'published') {
+      const session = await getServerSession(authOptions);
+      if (session?.user?.role !== 'admin') {
+        return NextResponse.json({ error: 'Review not found' }, { status: 404 });
+      }
     }
 
     return NextResponse.json(review);
@@ -55,6 +51,14 @@ export async function PUT(
 
   try {
     logger.info('PUT /api/reviews/[id] - Starting request processing', { id: params.id });
+
+    if (process.env.NODE_ENV === 'production') {
+      const csrfResult = await csrfMiddleware(request);
+      if (csrfResult) {
+        logger.warn('CSRF validation failed', { id: params.id, ip: request.ip });
+        return csrfResult;
+      }
+    }
 
     session = await getServerSession(authOptions);
     if (!session?.user?.email) {
@@ -177,6 +181,14 @@ export async function DELETE(
 
   try {
     logger.info('DELETE /api/reviews/[id] - Starting request processing', { id: params.id });
+
+    if (process.env.NODE_ENV === 'production') {
+      const csrfResult = await csrfMiddleware(request);
+      if (csrfResult) {
+        logger.warn('CSRF validation failed', { id: params.id, ip: request.ip });
+        return csrfResult;
+      }
+    }
 
     session = await getServerSession(authOptions);
     if (!session?.user?.email) {

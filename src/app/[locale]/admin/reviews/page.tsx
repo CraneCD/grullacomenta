@@ -44,7 +44,6 @@ export default function ReviewsPage() {
       const response = await fetch('/api/reviews');
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched reviews:', data); // Debug log
         setReviews(data);
       } else {
         console.error('Failed to fetch reviews:', response.status, response.statusText);
@@ -64,8 +63,19 @@ export default function ReviewsPage() {
     }
 
     try {
+      const csrfResponse = await fetch('/api/csrf', { credentials: 'include' });
+      if (!csrfResponse.ok) {
+        alert('Failed to delete review: could not verify session');
+        return;
+      }
+      const { token: csrfToken } = await csrfResponse.json();
+
       const response = await fetch(`/api/reviews/${reviewId}`, {
         method: 'DELETE',
+        headers: {
+          'X-CSRF-Token': csrfToken,
+        },
+        credentials: 'include',
       });
 
       if (response.ok) {
