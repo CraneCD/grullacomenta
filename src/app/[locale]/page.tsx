@@ -57,6 +57,11 @@ export default function Home() {
   const tCommon = useTranslations('common');
   const locale = useLocale();
 
+  // While loading we show skeletons for both sections; once loaded, only show
+  // a section if it actually has reviews.
+  const showAnime = loading || animeReviews.length > 0;
+  const showManga = loading || mangaReviews.length > 0;
+
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -110,6 +115,7 @@ export default function Home() {
       <div className="space-y-14">
 
         {/* Anime — persimmon accent */}
+        {showAnime && (
         <section aria-label="Anime">
           <div className="flex items-end justify-between mb-7">
             <div className="flex items-center gap-3">
@@ -134,18 +140,16 @@ export default function Home() {
 
           {loading ? (
             <SkeletonGrid />
-          ) : animeReviews.length > 0 ? (
-            <ReviewGrid reviews={animeReviews} />
           ) : (
-            <div className="text-center text-ink-500 py-10 bg-paper-50 rounded-xl border border-border">
-              {t('noAnimePosts')}
-            </div>
+            <ReviewGrid reviews={animeReviews} />
           )}
         </section>
+        )}
 
-        <div className="border-t border-divider" />
+        {showAnime && showManga && <div className="border-t border-divider" />}
 
         {/* Manga — indigo accent */}
+        {showManga && (
         <section aria-label="Manga">
           <div className="flex items-end justify-between mb-7">
             <div className="flex items-center gap-3">
@@ -170,14 +174,11 @@ export default function Home() {
 
           {loading ? (
             <SkeletonGrid />
-          ) : mangaReviews.length > 0 ? (
-            <ReviewGrid reviews={mangaReviews} />
           ) : (
-            <div className="text-center text-ink-500 py-10 bg-paper-50 rounded-xl border border-border">
-              {t('noMangaPosts')}
-            </div>
+            <ReviewGrid reviews={mangaReviews} />
           )}
         </section>
+        )}
 
       </div>
     </div>
