@@ -92,6 +92,12 @@ export default function AnimeMangaPage() {
         : 'text-ink-700 bg-paper-200 hover:bg-paper-300'
     }`;
 
+  // Only offer the filter buttons when there is something to filter between —
+  // i.e. both anime and manga reviews exist.
+  const hasAnime = reviews.some(review => review.category === 'anime');
+  const hasManga = reviews.some(review => review.category === 'manga');
+  const showFilters = hasAnime && hasManga;
+
   return (
     <div className="space-y-8">
       <div>
@@ -100,17 +106,19 @@ export default function AnimeMangaPage() {
         <p className="mt-2 font-body text-ink-600">{t('animeMangaDescription')}</p>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <button onClick={() => handleFilterChange('all')} className={filterBtn('all')}>
-          {t('filterAll')}
-        </button>
-        <button onClick={() => handleFilterChange('anime')} className={filterBtn('anime')}>
-          {t('filterAnime')}
-        </button>
-        <button onClick={() => handleFilterChange('manga')} className={filterBtn('manga')}>
-          {t('filterManga')}
-        </button>
-      </div>
+      {showFilters && (
+        <div className="flex flex-wrap gap-3">
+          <button onClick={() => handleFilterChange('all')} className={filterBtn('all')}>
+            {t('filterAll')}
+          </button>
+          <button onClick={() => handleFilterChange('anime')} className={filterBtn('anime')}>
+            {t('filterAnime')}
+          </button>
+          <button onClick={() => handleFilterChange('manga')} className={filterBtn('manga')}>
+            {t('filterManga')}
+          </button>
+        </div>
+      )}
 
       {filteredReviews.length > 0 ? (
         <ReviewGrid reviews={filteredReviews} />
