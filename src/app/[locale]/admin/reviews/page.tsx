@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
-import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilIcon, TrashIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import { getLocalizedTitle } from '@/lib/utils';
 
 interface Review {
@@ -16,6 +16,7 @@ interface Review {
   youtubeUrl?: string;
   rating?: number;
   status: string;
+  order?: number;
   createdAt: string;
   updatedAt: string;
   content?: string;
@@ -33,6 +34,9 @@ export default function ReviewsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
   const locale = useLocale();
 
   useEffect(() => {
@@ -90,14 +94,85 @@ export default function ReviewsPage() {
     }
   };
 
+  const filtersActive = Boolean(searchTerm || categoryFilter || statusFilter);
+
   const filteredReviews = reviews.filter(review => {
     const localizedTitle = getLocalizedTitle(review, locale);
     const matchesSearch = localizedTitle.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || review.category.toLowerCase().includes(categoryFilter.toLowerCase());
     const matchesStatus = !statusFilter || review.status.toLowerCase() === statusFilter.toLowerCase();
-    
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
+
+  // Persist a freshly reordered list to the server. Updates the UI optimistically
+  // and reverts if the request fails. The order is global and is reflected on the
+  // public site (home, category pages and the all-reviews page).
+  const persistOrder = async (ordered: Review[]) => {
+    const previous = reviews;
+    setReviews(ordered);
+    setSavingOrder(true);
+    try {
+      const csrfResponse = await fetch('/api/csrf', { credentials: 'include' });
+      if (!csrfResponse.ok) {
+        throw new Error('Could not verify session');
+      }
+      const { token: csrfToken } = await csrfResponse.json();
+
+      const response = await fetch('/api/reviews/reorder', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
+        credentials: 'include',
+        body: JSON.stringify({ ids: ordered.map((review) => review.id) }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || 'Failed to save order');
+      }
+    } catch (error) {
+      console.error('Error saving review order:', error);
+      setReviews(previous);
+      alert('Failed to save the new order. Please try again.');
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
+  const handleDragStart = (index: number) => {
+    if (filtersActive) return;
+    setDraggingIndex(index);
+  };
+
+  const handleDragOver = (index: number, e: React.DragEvent) => {
+    if (filtersActive || draggingIndex === null) return;
+    e.preventDefault();
+    setDragOverIndex(index);
+  };
+
+  const handleDrop = (index: number) => {
+    if (filtersActive || draggingIndex === null || draggingIndex === index) {
+      setDraggingIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const reordered = [...reviews];
+    const [moved] = reordered.splice(draggingIndex, 1);
+    reordered.splice(index, 0, moved);
+
+    setDraggingIndex(null);
+    setDragOverIndex(null);
+    persistOrder(reordered);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingIndex(null);
+    setDragOverIndex(null);
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
@@ -159,11 +234,27 @@ export default function ReviewsPage() {
         </select>
       </div>
 
+      {/* Reorder hint */}
+      <div className="text-sm text-gray-400">
+        {filtersActive ? (
+          <span className="text-yellow-400/80">
+            Clear search and filters to drag &amp; drop reviews into a new order.
+          </span>
+        ) : (
+          <span>
+            Drag the <Bars3Icon className="inline w-4 h-4 -mt-0.5" /> handle to reorder reviews.
+            This order is reflected on the home page, category pages and the all-reviews page.
+            {savingOrder && <span className="ml-2 text-blue-400">Saving…</span>}
+          </span>
+        )}
+      </div>
+
       {/* Reviews Table */}
       <div className="bg-[#1a1a1a] rounded-lg border border-gray-800">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-800">
+              <th className="px-3 py-4 text-left text-sm font-medium text-gray-400 w-10"></th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Title</th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Category</th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-400">Titles</th>
@@ -176,8 +267,34 @@ export default function ReviewsPage() {
           </thead>
           <tbody className="divide-y divide-gray-800">
             {filteredReviews.length > 0 ? (
-              filteredReviews.map((review) => (
-                <tr key={review.id} className="hover:bg-[#2d2d2d] transition-colors">
+              filteredReviews.map((review, index) => (
+                <tr
+                  key={review.id}
+                  onDragOver={(e) => handleDragOver(index, e)}
+                  onDrop={() => handleDrop(index)}
+                  className={`transition-colors ${
+                    draggingIndex === index ? 'opacity-50' : ''
+                  } ${
+                    dragOverIndex === index && draggingIndex !== index
+                      ? 'border-t-2 border-blue-500'
+                      : ''
+                  } hover:bg-[#2d2d2d]`}
+                >
+                  <td className="px-3 py-4">
+                    <span
+                      draggable={!filtersActive}
+                      onDragStart={() => handleDragStart(index)}
+                      onDragEnd={handleDragEnd}
+                      title={filtersActive ? 'Clear filters to reorder' : 'Drag to reorder'}
+                      className={`inline-flex ${
+                        filtersActive
+                          ? 'text-gray-700 cursor-not-allowed'
+                          : 'text-gray-500 hover:text-white cursor-grab active:cursor-grabbing'
+                      }`}
+                    >
+                      <Bars3Icon className="w-5 h-5" />
+                    </span>
+                  </td>
                   <td className="px-6 py-4">
                     <div>
                       <div className="text-white font-medium">{getLocalizedTitle(review, locale)}</div>
@@ -244,7 +361,7 @@ export default function ReviewsPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center">
+                <td colSpan={9} className="px-6 py-12 text-center">
                   <div className="text-gray-400">
                     <div className="text-lg font-medium mb-2">No reviews found</div>
                     <div className="text-sm">

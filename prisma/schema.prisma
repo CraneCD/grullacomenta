@@ -28,6 +28,7 @@ model Review {
   category      String
   platform      String?
   rating        Float?
+  order         Int      @default(0)
   coverImage    String?
   imageData     String?
   imageMimeType String?
@@ -39,4 +40,6 @@ model Review {
   titleEn       String?
   titleEs       String?
   author        User     @relation(fields: [authorId], references: [id])
+
+  @@index([order])
 }

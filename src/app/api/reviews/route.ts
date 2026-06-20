@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
         youtubeUrl: true,
         rating: true,
         status: true,
+        order: true,
         createdAt: true,
         updatedAt: true,
         authorId: true,
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
     });
 
     const hasContentFlags = await prisma.$queryRaw`
@@ -156,10 +157,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Place new reviews at the top of the manual ordering (lowest `order`).
+    const { _min } = await prisma.review.aggregate({ _min: { order: true } });
+    const newOrder = (_min.order ?? 0) - 1;
+
     logger.info('Creating new review', { title, category, authorId: user.id });
 
     const review = await prisma.review.create({
       data: {
+        order: newOrder,
         title,
         titleEs: titleEs ?? null,
         titleEn: titleEn ?? null,

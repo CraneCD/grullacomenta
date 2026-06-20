@@ -36,13 +36,14 @@ export async function GET(request: NextRequest) {
         slug: true,
         rating: true,
         status: true,
+        order: true,
         createdAt: true,
         updatedAt: true,
         author: {
           select: { name: true },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       ...(take !== undefined ? { take } : {}),
     });
 
@@ -69,6 +70,7 @@ export async function GET(request: NextRequest) {
       slug: review.slug,
       rating: review.rating,
       status: review.status,
+      order: review.order,
       authorName: review.author.name,
     }));
 
