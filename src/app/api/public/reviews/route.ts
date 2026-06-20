@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
         category: true,
         platform: true,
         coverImage: true,
-        imageData: true,
         imageMimeType: true,
         youtubeUrl: true,
         slug: true,
@@ -47,6 +46,13 @@ export async function GET(request: NextRequest) {
       ...(take !== undefined ? { take } : {}),
     });
 
+    const imageFlags = await prisma.$queryRaw`
+      SELECT id, ("imageData" IS NOT NULL AND "imageData" != '') AS "hasImageData"
+      FROM "Review"
+    ` as { id: string; hasImageData: boolean }[];
+
+    const hasImageById = new Map(imageFlags.map((f) => [f.id, f.hasImageData]));
+
     const transformedReviews = reviews.map((review: (typeof reviews)[number]) => ({
       id: review.id,
       title: review.title,
@@ -55,7 +61,7 @@ export async function GET(request: NextRequest) {
       category: review.category,
       platform: review.platform,
       coverImage: review.coverImage,
-      imageData: review.imageData ? 'uploaded' : null,
+      imageData: hasImageById.get(review.id) ? 'uploaded' : null,
       imageMimeType: review.imageMimeType,
       youtubeUrl: review.youtubeUrl,
       date: review.createdAt,
