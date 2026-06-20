@@ -53,9 +53,13 @@ export async function PATCH(request: NextRequest) {
 
     logger.info('Reordering reviews', { count: ids.length });
 
+    // Use updateMany (not update) so each statement returns only a row count
+    // rather than the full review record. update() would echo back every
+    // column — including the large base64 `imageData` blob — which overflows
+    // Prisma Accelerate's 5MB response limit (P6009) across the batch.
     await prisma.$transaction(
       ids.map((id, index) =>
-        prisma.review.update({
+        prisma.review.updateMany({
           where: { id },
           data: { order: index },
         })
