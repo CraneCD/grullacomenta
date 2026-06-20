@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
           select: { name: true },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
       take: SEARCH_LIMIT,
     });
 

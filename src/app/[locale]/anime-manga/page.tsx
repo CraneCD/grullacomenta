@@ -7,6 +7,7 @@ import ReviewGrid from '@/components/ReviewGrid';
 interface Review {
   id: string;
   title: string;
+  order?: number;
   category: string;
   coverImage?: string;
   imageData?: string;
@@ -47,9 +48,14 @@ export default function AnimeMangaPage() {
       const animeData = animeResponse.ok ? await animeResponse.json() : [];
       const mangaData = mangaResponse.ok ? await mangaResponse.json() : [];
 
-      const allReviews = [...animeData, ...mangaData].sort((a, b) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
+      // Merge anime + manga and honour the admin's manual ordering
+      // (lower `order` first), falling back to newest-first by date.
+      const allReviews = [...animeData, ...mangaData].sort((a, b) => {
+        const orderA = a.order ?? 0;
+        const orderB = b.order ?? 0;
+        if (orderA !== orderB) return orderA - orderB;
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
 
       setReviews(allReviews);
     } catch (error) {
