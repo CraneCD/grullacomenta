@@ -61,6 +61,39 @@ export const reviewSchema = z.object({
   status: z.enum(['draft', 'published', 'archived']).default('draft'),
 });
 
+// Home banner validation schema.
+// All fields are optional — an empty banner simply falls back to the
+// translated defaults on the homepage. Links may be internal paths
+// (e.g. "anime-manga", "/anime-manga") or absolute http(s) URLs.
+const optionalLink = z.preprocess(
+  (val) => (val === '' ? null : val),
+  z.string().max(500).optional().nullable()
+);
+
+export const homeBannerSchema = z.object({
+  kickerEs: optionalText(1, 120),
+  kickerEn: optionalText(1, 120),
+  titleEs: optionalText(1, 200),
+  titleEn: optionalText(1, 200),
+  subtitleEs: optionalText(1, 400),
+  subtitleEn: optionalText(1, 400),
+  primaryLabelEs: optionalText(1, 80),
+  primaryLabelEn: optionalText(1, 80),
+  primaryLink: optionalLink,
+  secondaryLabelEs: optionalText(1, 80),
+  secondaryLabelEn: optionalText(1, 80),
+  secondaryLink: optionalLink,
+  backgroundImage: optionalUrl,
+  imageData: z.preprocess(
+    (val) => (val === '' ? null : val),
+    z.string().regex(BASE64_RE, { message: 'imageData must be valid base64' }).optional().nullable()
+  ),
+  imageMimeType: z.preprocess(
+    (val) => (val === '' ? null : val),
+    z.enum(ALLOWED_IMAGE_MIME_TYPES).optional().nullable()
+  ),
+});
+
 // User validation schema
 export const userSchema = z.object({
   name: z.string().min(2).max(50).optional(),

@@ -43,3 +43,25 @@ model Review {
 
   @@index([order])
 }
+
+// Singleton record holding the editable homepage hero banner.
+// There is only ever one row, keyed by a fixed id ("home").
+model HomeBanner {
+  id               String   @id @default("home")
+  kickerEs         String?
+  kickerEn         String?
+  titleEs          String?
+  titleEn          String?
+  subtitleEs       String?
+  subtitleEn       String?
+  primaryLabelEs   String?
+  primaryLabelEn   String?
+  primaryLink      String?
+  secondaryLabelEs String?
+  secondaryLabelEn String?
+  secondaryLink    String?
+  backgroundImage  String?
+  imageData        String?
+  imageMimeType    String?
+  updatedAt        DateTime @updatedAt
+}
