@@ -1,69 +1,11 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useTranslations, useLocale } from 'next-intl';
-import ReviewGrid from '@/components/ReviewGrid';
+import { getTranslations } from 'next-intl/server';
+import { prisma } from '@/lib/prisma';
+import HomeReviews from '@/components/HomeReviews';
 
-interface Review {
-  id: string;
-  title: string;
-  titleEs?: string;
-  titleEn?: string;
-  category: string;
-  platform?: string;
-  coverImage?: string;
-  imageData?: string;
-  imageMimeType?: string;
-  date: string;
-  slug: string;
-  rating?: number;
-  authorName: string;
-  content?: string;
-  contentEs?: string;
-  contentEn?: string;
-}
-
-function ChevronRight() {
-  return (
-    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-    </svg>
-  );
-}
-
-function SkeletonGrid() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="bg-paper-50 border border-border rounded-lg overflow-hidden animate-pulse">
-          <div className="aspect-video bg-paper-300/60" />
-          <div className="p-5 space-y-3">
-            <div className="h-3 bg-paper-300/70 rounded-pill w-1/3" />
-            <div className="h-5 bg-paper-300/70 rounded w-5/6" />
-            <div className="h-4 bg-paper-300/70 rounded w-1/2" />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-interface Banner {
-  kickerEs?: string | null;
-  kickerEn?: string | null;
-  titleEs?: string | null;
-  titleEn?: string | null;
-  subtitleEs?: string | null;
-  subtitleEn?: string | null;
-  primaryLabelEs?: string | null;
-  primaryLabelEn?: string | null;
-  primaryLink?: string | null;
-  secondaryLabelEs?: string | null;
-  secondaryLabelEn?: string | null;
-  secondaryLink?: string | null;
-  backgroundUrl?: string | null;
-}
+// Render on every request so a freshly saved banner shows immediately
+// (and so the hero is in the initial HTML — no flash of default content).
+export const dynamic = 'force-dynamic';
 
 function firstNonEmpty(...vals: (string | null | undefined)[]): string {
   return vals.find((v) => v && v.trim() !== '')?.trim() ?? '';
@@ -84,53 +26,45 @@ function isExternal(link: string | null | undefined): boolean {
   return /^https?:\/\//i.test(link?.trim() ?? '');
 }
 
-export default function Home() {
-  const [animeReviews, setAnimeReviews] = useState<Review[]>([]);
-  const [mangaReviews, setMangaReviews] = useState<Review[]>([]);
-  const [banner, setBanner] = useState<Banner>({});
-  const [loading, setLoading] = useState(true);
-  const t = useTranslations('home');
-  const tCommon = useTranslations('common');
-  const locale = useLocale();
+export default async function Home({ params: { locale } }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale, namespace: 'home' });
 
-  // While loading we show skeletons for both sections; once loaded, only show
-  // a section if it actually has reviews.
-  const showAnime = loading || animeReviews.length > 0;
-  const showManga = loading || mangaReviews.length > 0;
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const [animeRes, mangaRes, bannerRes] = await Promise.all([
-          fetch('/api/public/reviews?category=anime&limit=12'),
-          fetch('/api/public/reviews?category=manga&limit=12'),
-          fetch('/api/public/home-banner', { cache: 'no-store' }),
-        ]);
-        setAnimeReviews(animeRes.ok ? await animeRes.json() : []);
-        setMangaReviews(mangaRes.ok ? await mangaRes.json() : []);
-        if (bannerRes.ok) setBanner(await bannerRes.json());
-      } catch (error) {
-        console.error('Error fetching reviews:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReviews();
-  }, []);
+  let banner: Awaited<ReturnType<typeof prisma.homeBanner.findUnique>> = null;
+  try {
+    banner = await prisma.homeBanner.findUnique({ where: { id: 'home' } });
+  } catch (error) {
+    // Fail soft — fall back to the translated defaults below.
+    console.error('Error loading home banner:', error);
+  }
 
   // Pick the field for the current locale, falling back to the other
   // language and finally to the translated default.
   const pickText = (es?: string | null, en?: string | null, fallback = '') =>
     firstNonEmpty(locale === 'en' ? en : es, locale === 'en' ? es : en) || fallback;
 
-  const kicker = pickText(banner.kickerEs, banner.kickerEn, t('heroKicker'));
-  const heroTitle = pickText(banner.titleEs, banner.titleEn, t('heroTitle'));
-  const subtitle = pickText(banner.subtitleEs, banner.subtitleEn, t('subtitle'));
-  const primaryLabel = pickText(banner.primaryLabelEs, banner.primaryLabelEn, t('viewAllReviews'));
-  const primaryHref = resolveHref(banner.primaryLink, locale, `/${locale}/anime-manga`);
-  const secondaryLabel = pickText(banner.secondaryLabelEs, banner.secondaryLabelEn);
-  const secondaryHref = resolveHref(banner.secondaryLink, locale, '#');
-  const backgroundUrl = banner.backgroundUrl?.trim() || null;
+  const hasUpload = Boolean(banner?.imageData && banner?.imageMimeType);
+  const backgroundUrl = hasUpload
+    ? `/api/home-banner/image?v=${new Date(banner!.updatedAt).getTime()}`
+    : banner?.backgroundImage?.trim() || null;
+
+  const kicker = pickText(banner?.kickerEs, banner?.kickerEn, t('heroKicker'));
+  const heroTitle = pickText(banner?.titleEs, banner?.titleEn, t('heroTitle'));
+  const subtitle = pickText(banner?.subtitleEs, banner?.subtitleEn, t('subtitle'));
+  const primaryLabel = pickText(banner?.primaryLabelEs, banner?.primaryLabelEn, t('viewAllReviews'));
+  const primaryHref = resolveHref(banner?.primaryLink, locale, `/${locale}/anime-manga`);
+  const secondaryLabel = pickText(banner?.secondaryLabelEs, banner?.secondaryLabelEn);
+  const secondaryHref = resolveHref(banner?.secondaryLink, locale, '#');
+
+  const primaryClass =
+    'inline-flex items-center gap-2 bg-persimmon-500 hover:bg-persimmon-600 text-[#FFF8F0] font-ui font-bold px-6 py-3 rounded-pill shadow-md transition-colors active:translate-y-px';
+  const secondaryClass =
+    'inline-flex items-center gap-2 bg-paper-100/10 hover:bg-paper-100/20 text-paper-100 ring-1 ring-paper-100/30 font-ui font-bold px-6 py-3 rounded-pill transition-colors active:translate-y-px';
+
+  const arrow = (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  );
 
   return (
     <div>
@@ -166,41 +100,23 @@ export default function Home() {
               {subtitle}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {isExternal(banner.primaryLink) ? (
-                <a
-                  href={primaryHref}
-                  className="inline-flex items-center gap-2 bg-persimmon-500 hover:bg-persimmon-600 text-[#FFF8F0] font-ui font-bold px-6 py-3 rounded-pill shadow-md transition-colors active:translate-y-px"
-                >
-                  {primaryLabel}
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+              {isExternal(banner?.primaryLink) ? (
+                <a href={primaryHref} className={primaryClass}>
+                  {primaryLabel} {arrow}
                 </a>
               ) : (
-                <Link
-                  href={primaryHref}
-                  className="inline-flex items-center gap-2 bg-persimmon-500 hover:bg-persimmon-600 text-[#FFF8F0] font-ui font-bold px-6 py-3 rounded-pill shadow-md transition-colors active:translate-y-px"
-                >
-                  {primaryLabel}
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                <Link href={primaryHref} className={primaryClass}>
+                  {primaryLabel} {arrow}
                 </Link>
               )}
 
               {secondaryLabel && (
-                isExternal(banner.secondaryLink) ? (
-                  <a
-                    href={secondaryHref}
-                    className="inline-flex items-center gap-2 bg-paper-100/10 hover:bg-paper-100/20 text-paper-100 ring-1 ring-paper-100/30 font-ui font-bold px-6 py-3 rounded-pill transition-colors active:translate-y-px"
-                  >
+                isExternal(banner?.secondaryLink) ? (
+                  <a href={secondaryHref} className={secondaryClass}>
                     {secondaryLabel}
                   </a>
                 ) : (
-                  <Link
-                    href={secondaryHref}
-                    className="inline-flex items-center gap-2 bg-paper-100/10 hover:bg-paper-100/20 text-paper-100 ring-1 ring-paper-100/30 font-ui font-bold px-6 py-3 rounded-pill transition-colors active:translate-y-px"
-                  >
+                  <Link href={secondaryHref} className={secondaryClass}>
                     {secondaryLabel}
                   </Link>
                 )
@@ -211,75 +127,7 @@ export default function Home() {
       </div>
 
       {/* ── Sections ───────────────────────────────────────────────────────── */}
-      <div className="space-y-14">
-
-        {/* Anime — persimmon accent */}
-        {showAnime && (
-        <section aria-label="Anime">
-          <div className="flex items-end justify-between mb-7">
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-9 bg-persimmon-500 rounded-pill" aria-hidden="true" />
-              <div>
-                <h2 className="font-display text-2xl font-bold text-ink-900 leading-none mb-1">Anime</h2>
-                {!loading && (
-                  <p className="text-xs text-ink-500">
-                    {animeReviews.length}{' '}
-                    {animeReviews.length === 1 ? 'ensayo' : 'ensayos'}
-                  </p>
-                )}
-              </div>
-            </div>
-            <Link
-              href={`/${locale}/anime-manga`}
-              className="text-sm text-persimmon-600 hover:text-persimmon-700 font-ui font-bold flex items-center gap-1 transition-colors"
-            >
-              {tCommon('viewAll')} <ChevronRight />
-            </Link>
-          </div>
-
-          {loading ? (
-            <SkeletonGrid />
-          ) : (
-            <ReviewGrid reviews={animeReviews} />
-          )}
-        </section>
-        )}
-
-        {showAnime && showManga && <div className="border-t border-divider" />}
-
-        {/* Manga — indigo accent */}
-        {showManga && (
-        <section aria-label="Manga">
-          <div className="flex items-end justify-between mb-7">
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-9 bg-indigo-500 rounded-pill" aria-hidden="true" />
-              <div>
-                <h2 className="font-display text-2xl font-bold text-ink-900 leading-none mb-1">Manga</h2>
-                {!loading && (
-                  <p className="text-xs text-ink-500">
-                    {mangaReviews.length}{' '}
-                    {mangaReviews.length === 1 ? 'ensayo' : 'ensayos'}
-                  </p>
-                )}
-              </div>
-            </div>
-            <Link
-              href={`/${locale}/anime-manga`}
-              className="text-sm text-indigo-500 hover:text-indigo-600 font-ui font-bold flex items-center gap-1 transition-colors"
-            >
-              {tCommon('viewAll')} <ChevronRight />
-            </Link>
-          </div>
-
-          {loading ? (
-            <SkeletonGrid />
-          ) : (
-            <ReviewGrid reviews={mangaReviews} />
-          )}
-        </section>
-        )}
-
-      </div>
+      <HomeReviews />
     </div>
   );
 }
