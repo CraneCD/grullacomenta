@@ -49,9 +49,45 @@ function SkeletonGrid() {
   );
 }
 
+interface Banner {
+  kickerEs?: string | null;
+  kickerEn?: string | null;
+  titleEs?: string | null;
+  titleEn?: string | null;
+  subtitleEs?: string | null;
+  subtitleEn?: string | null;
+  primaryLabelEs?: string | null;
+  primaryLabelEn?: string | null;
+  primaryLink?: string | null;
+  secondaryLabelEs?: string | null;
+  secondaryLabelEn?: string | null;
+  secondaryLink?: string | null;
+  backgroundUrl?: string | null;
+}
+
+function firstNonEmpty(...vals: (string | null | undefined)[]): string {
+  return vals.find((v) => v && v.trim() !== '')?.trim() ?? '';
+}
+
+// Resolve an admin-entered link. Absolute http(s) links are returned as-is;
+// anything else is treated as an internal path and given a locale prefix.
+function resolveHref(link: string | null | undefined, locale: string, fallback: string): string {
+  if (!link || !link.trim()) return fallback;
+  const value = link.trim();
+  if (/^https?:\/\//i.test(value)) return value;
+  const path = value.startsWith('/') ? value : `/${value}`;
+  if (path === `/${locale}` || path.startsWith(`/${locale}/`)) return path;
+  return `/${locale}${path}`;
+}
+
+function isExternal(link: string | null | undefined): boolean {
+  return /^https?:\/\//i.test(link?.trim() ?? '');
+}
+
 export default function Home() {
   const [animeReviews, setAnimeReviews] = useState<Review[]>([]);
   const [mangaReviews, setMangaReviews] = useState<Review[]>([]);
+  const [banner, setBanner] = useState<Banner>({});
   const [loading, setLoading] = useState(true);
   const t = useTranslations('home');
   const tCommon = useTranslations('common');
@@ -65,12 +101,14 @@ export default function Home() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const [animeRes, mangaRes] = await Promise.all([
+        const [animeRes, mangaRes, bannerRes] = await Promise.all([
           fetch('/api/public/reviews?category=anime&limit=12'),
           fetch('/api/public/reviews?category=manga&limit=12'),
+          fetch('/api/public/home-banner'),
         ]);
         setAnimeReviews(animeRes.ok ? await animeRes.json() : []);
         setMangaReviews(mangaRes.ok ? await mangaRes.json() : []);
+        if (bannerRes.ok) setBanner(await bannerRes.json());
       } catch (error) {
         console.error('Error fetching reviews:', error);
       } finally {
@@ -80,33 +118,94 @@ export default function Home() {
     fetchReviews();
   }, []);
 
+  // Pick the field for the current locale, falling back to the other
+  // language and finally to the translated default.
+  const pickText = (es?: string | null, en?: string | null, fallback = '') =>
+    firstNonEmpty(locale === 'en' ? en : es, locale === 'en' ? es : en) || fallback;
+
+  const kicker = pickText(banner.kickerEs, banner.kickerEn, t('heroKicker'));
+  const heroTitle = pickText(banner.titleEs, banner.titleEn, t('heroTitle'));
+  const subtitle = pickText(banner.subtitleEs, banner.subtitleEn, t('subtitle'));
+  const primaryLabel = pickText(banner.primaryLabelEs, banner.primaryLabelEn, t('viewAllReviews'));
+  const primaryHref = resolveHref(banner.primaryLink, locale, `/${locale}/anime-manga`);
+  const secondaryLabel = pickText(banner.secondaryLabelEs, banner.secondaryLabelEn);
+  const secondaryHref = resolveHref(banner.secondaryLink, locale, '#');
+  const backgroundUrl = banner.backgroundUrl?.trim() || null;
+
   return (
     <div>
       {/* ── Hero — warm sumi-sepia card, color only ──────────────────────── */}
       <div className="mb-14 mt-2">
-        <div className="relative overflow-hidden rounded-2xl px-6 sm:px-10 lg:px-16 py-16 sm:py-24 shadow-xl ring-1 ring-persimmon-300/30
-                        bg-[radial-gradient(120%_140%_at_50%_-10%,#5a3a24_0%,#3a2a20_38%,#2a2018_72%,#231a14_100%)]">
+        <div
+          className="relative overflow-hidden rounded-2xl px-6 sm:px-10 lg:px-16 py-16 sm:py-24 shadow-xl ring-1 ring-persimmon-300/30
+                     bg-[radial-gradient(120%_140%_at_50%_-10%,#5a3a24_0%,#3a2a20_38%,#2a2018_72%,#231a14_100%)]"
+          style={
+            backgroundUrl
+              ? {
+                  backgroundImage: `url(${backgroundUrl})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }
+              : undefined
+          }
+        >
+          {/* Dark overlay for legibility when a background image is set */}
+          {backgroundUrl && (
+            <div className="absolute inset-0 bg-[#231a14]/70" aria-hidden="true" />
+          )}
 
           {/* ── Content ── */}
           <div className="relative mx-auto max-w-2xl text-center">
             <span className="gc-kicker text-persimmon-300 block mb-5">
-              {t('heroKicker')}
+              {kicker}
             </span>
             <h1 className="font-display text-4xl sm:text-5xl font-black text-paper-100 leading-tight mb-4 [text-shadow:0_2px_24px_rgba(0,0,0,0.35)]">
-              {t('heroTitle')}
+              {heroTitle}
             </h1>
             <p className="font-body text-ink-300 text-lg leading-relaxed mb-8 max-w-xl mx-auto">
-              {t('subtitle')}
+              {subtitle}
             </p>
-            <Link
-              href={`/${locale}/anime-manga`}
-              className="inline-flex items-center gap-2 bg-persimmon-500 hover:bg-persimmon-600 text-[#FFF8F0] font-ui font-bold px-6 py-3 rounded-pill shadow-md transition-colors active:translate-y-px"
-            >
-              {t('viewAllReviews')}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {isExternal(banner.primaryLink) ? (
+                <a
+                  href={primaryHref}
+                  className="inline-flex items-center gap-2 bg-persimmon-500 hover:bg-persimmon-600 text-[#FFF8F0] font-ui font-bold px-6 py-3 rounded-pill shadow-md transition-colors active:translate-y-px"
+                >
+                  {primaryLabel}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              ) : (
+                <Link
+                  href={primaryHref}
+                  className="inline-flex items-center gap-2 bg-persimmon-500 hover:bg-persimmon-600 text-[#FFF8F0] font-ui font-bold px-6 py-3 rounded-pill shadow-md transition-colors active:translate-y-px"
+                >
+                  {primaryLabel}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              )}
+
+              {secondaryLabel && (
+                isExternal(banner.secondaryLink) ? (
+                  <a
+                    href={secondaryHref}
+                    className="inline-flex items-center gap-2 bg-paper-100/10 hover:bg-paper-100/20 text-paper-100 ring-1 ring-paper-100/30 font-ui font-bold px-6 py-3 rounded-pill transition-colors active:translate-y-px"
+                  >
+                    {secondaryLabel}
+                  </a>
+                ) : (
+                  <Link
+                    href={secondaryHref}
+                    className="inline-flex items-center gap-2 bg-paper-100/10 hover:bg-paper-100/20 text-paper-100 ring-1 ring-paper-100/30 font-ui font-bold px-6 py-3 rounded-pill transition-colors active:translate-y-px"
+                  >
+                    {secondaryLabel}
+                  </Link>
+                )
+              )}
+            </div>
           </div>
         </div>
       </div>

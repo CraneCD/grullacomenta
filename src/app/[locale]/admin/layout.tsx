@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { redirect, usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
-import { 
-  HomeIcon, 
-  DocumentTextIcon
+import {
+  HomeIcon,
+  DocumentTextIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 
 export default function AdminLayout({
@@ -21,6 +22,7 @@ export default function AdminLayout({
   const sidebarItems = [
     { name: 'Dashboard', href: `/${locale}/admin`, icon: HomeIcon },
     { name: 'All Reviews', href: `/${locale}/admin/reviews`, icon: DocumentTextIcon },
+    { name: 'Home Banner', href: `/${locale}/admin/banner`, icon: PhotoIcon },
   ];
   
   // Don't apply authentication check to login page
