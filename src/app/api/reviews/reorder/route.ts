@@ -67,10 +67,28 @@ export async function PATCH(request: NextRequest) {
   } catch (error) {
     logger.error('Error reordering reviews', error as Error, { userEmail: session?.user?.email });
 
-    if (error instanceof Error && error.message.includes('Record to update not found')) {
+    const message = error instanceof Error ? error.message : String(error);
+    const code = (error as { code?: string })?.code;
+
+    if (message.includes('Record to update not found')) {
       return NextResponse.json({ error: 'One or more reviews not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ error: 'Failed to reorder reviews' }, { status: 500 });
+    // P2022 = column does not exist in the database. This means the `order`
+    // column hasn't been created yet (the `prisma db push` step didn't run).
+    if (code === 'P2022' || (message.includes('order') && message.includes('does not exist'))) {
+      return NextResponse.json(
+        {
+          error: 'The "order" column is missing from the database. Run `prisma db push` to create it.',
+          detail: message,
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Failed to reorder reviews', detail: message, code },
+      { status: 500 }
+    );
   }
 }
