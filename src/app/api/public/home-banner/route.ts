@@ -3,6 +3,11 @@ import { prisma } from '@/lib/prisma';
 
 const BANNER_ID = 'home';
 
+// This handler has no request-derived inputs, so Next.js would otherwise
+// cache it as a static route at build time and keep serving a stale (empty)
+// banner. Force it to run on every request so edits show up immediately.
+export const dynamic = 'force-dynamic';
+
 // Public, read-only view of the homepage banner. Text fields are returned
 // as-is (the homepage picks the language and falls back to translated
 // defaults for any empty field). The background, if any, is exposed as a

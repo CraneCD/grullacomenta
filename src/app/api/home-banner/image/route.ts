@@ -26,6 +26,9 @@ function isAllowedImageUrl(url: string): boolean {
   }
 }
 
+// Serve the current image on every request rather than caching at build time.
+export const dynamic = 'force-dynamic';
+
 // GET the banner background image. Serves an uploaded image from the
 // database, or redirects to an allow-listed external URL.
 export async function GET() {

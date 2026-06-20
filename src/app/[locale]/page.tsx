@@ -104,7 +104,7 @@ export default function Home() {
         const [animeRes, mangaRes, bannerRes] = await Promise.all([
           fetch('/api/public/reviews?category=anime&limit=12'),
           fetch('/api/public/reviews?category=manga&limit=12'),
-          fetch('/api/public/home-banner'),
+          fetch('/api/public/home-banner', { cache: 'no-store' }),
         ]);
         setAnimeReviews(animeRes.ok ? await animeRes.json() : []);
         setMangaReviews(mangaRes.ok ? await mangaRes.json() : []);
