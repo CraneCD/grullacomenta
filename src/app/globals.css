@@ -155,6 +155,49 @@
     @apply text-lg leading-[1.75] text-ink-800;
   }
 
+  /* Markdown-rendered content inside the reading column */
+  .gc-markdown > :first-child { margin-top: 0; }
+  .gc-markdown > :last-child { margin-bottom: 0; }
+  .gc-markdown p { @apply mb-6; }
+  .gc-markdown h1 { @apply text-3xl md:text-4xl font-bold mt-10 mb-4; }
+  .gc-markdown h2 { @apply text-2xl md:text-3xl font-bold mt-10 mb-4 pb-2 border-b border-divider; }
+  .gc-markdown h3 { @apply text-xl md:text-2xl font-semibold mt-8 mb-3; }
+  .gc-markdown h4,
+  .gc-markdown h5,
+  .gc-markdown h6 { @apply text-lg font-semibold text-ink-900 mt-6 mb-2; }
+  .gc-markdown strong { @apply font-bold text-ink-900; }
+  .gc-markdown em { @apply italic; }
+  .gc-markdown del { @apply line-through text-ink-500; }
+  .gc-markdown a {
+    @apply text-persimmon-600 underline decoration-persimmon-300 underline-offset-4 transition-colors hover:text-persimmon-700 hover:decoration-persimmon-500;
+  }
+  .gc-markdown ul { @apply list-disc pl-7 mb-6 space-y-2; }
+  .gc-markdown ol { @apply list-decimal pl-7 mb-6 space-y-2; }
+  .gc-markdown li > ul,
+  .gc-markdown li > ol { @apply mt-2 mb-0; }
+  .gc-markdown li::marker { @apply text-persimmon-500; }
+  .gc-markdown li > p { @apply mb-2; }
+  .gc-markdown ul.contains-task-list { @apply list-none pl-1; }
+  .gc-markdown input[type='checkbox'] { @apply mr-2 accent-persimmon-500; }
+  .gc-markdown blockquote {
+    @apply my-8 pl-6 pr-4 py-3 border-l-4 border-persimmon-400 bg-paper-50 rounded-r-md italic text-ink-700;
+  }
+  .gc-markdown blockquote p:last-child { @apply mb-0; }
+  .gc-markdown hr { @apply my-10 border-0 h-px bg-border-strong; }
+  .gc-markdown code {
+    @apply font-mono text-[0.85em] px-1.5 py-0.5 rounded-xs bg-paper-200 text-azuki-600;
+  }
+  .gc-markdown pre {
+    @apply my-6 p-4 rounded-md bg-ink-900 text-paper-100 overflow-x-auto text-sm leading-relaxed;
+  }
+  .gc-markdown pre code { @apply p-0 bg-transparent text-inherit text-[1em]; }
+  .gc-markdown img { @apply my-8 mx-auto rounded-lg border border-border shadow-sm max-w-full h-auto; }
+  .gc-md-table { @apply my-8 overflow-x-auto rounded-md border border-border; }
+  .gc-markdown table { @apply w-full border-collapse text-base; }
+  .gc-markdown th { @apply bg-paper-200 font-ui font-bold text-left text-ink-900 px-4 py-2 border-b border-border-strong; }
+  .gc-markdown td { @apply px-4 py-2 border-b border-divider align-top; }
+  .gc-markdown tr:last-child td { @apply border-b-0; }
+
   .icon {
     @apply w-5 h-5;
   }

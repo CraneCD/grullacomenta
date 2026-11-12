@@ -8,6 +8,7 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { useTranslations, useLocale } from 'next-intl';
 import ReviewGrid from '@/components/ReviewGrid';
 import { CraneRating } from '@/components/Crane';
+import MarkdownContent from '@/components/MarkdownContent';
 import { getLocalizedContent, hasContentForLocale, getLocalizedTitle, hasTitleForLocale, extractYouTubeVideoId, createYouTubeEmbedUrl } from '@/lib/utils';
 
 interface Review {
@@ -170,15 +171,7 @@ export default function ReviewPage({ params }: { params: { slug: string } }) {
             </div>
           </div>
 
-          <div className="gc-prose w-full">
-            {getLocalizedContent(review, locale).split('\n').map((paragraph, index) => (
-              paragraph.trim() && (
-                <p key={index} className="mb-6">
-                  {paragraph.trim()}
-                </p>
-              )
-            ))}
-          </div>
+          <MarkdownContent content={getLocalizedContent(review, locale)} className="w-full" />
 
           {/* YouTube Video Embed */}
           {review.youtubeUrl && (

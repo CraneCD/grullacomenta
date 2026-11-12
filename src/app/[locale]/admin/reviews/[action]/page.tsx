@@ -630,6 +630,11 @@ export default function ReviewForm({ params }: { params: { action: string } }) {
             </div>
           )}
 
+          <p className="text-xs text-gray-500">
+            Markdown supported: <code>## Heading</code>, <code>**bold**</code>, <code>*italic*</code>,{' '}
+            <code>[link](https://…)</code>, <code>- list</code>, <code>&gt; quote</code>, <code>![alt](image-url)</code>, tables.
+          </p>
+
           {/* Content Status Indicators */}
           <div className="flex space-x-4 text-sm">
             <div className={`flex items-center space-x-2 ${formData.contentEs ? 'text-green-400' : 'text-gray-500'}`}>
